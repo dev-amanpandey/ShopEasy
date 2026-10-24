@@ -13,6 +13,7 @@ import OrderTracking from './pages/OrderTracking'
 import AdminDashboard from './pages/AdminDashboard'
 import { AboutPage, CategoriesPage, ContactPage, FAQPage, OrderConfirmationPage, PolicyPage } from './pages/DesignPages'
 import { CartProvider } from './context/CartContext'
+import { WishlistProvider } from './context/WishlistContext'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
@@ -21,8 +22,9 @@ function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
-        <CartProvider>
-          <Layout>
+        <WishlistProvider>
+          <CartProvider>
+            <Layout>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/products" element={<Products />} />
@@ -85,8 +87,9 @@ function App() {
                 }
               />
             </Routes>
-          </Layout>
-        </CartProvider>
+            </Layout>
+          </CartProvider>
+        </WishlistProvider>
       </AuthProvider>
     </ErrorBoundary>
   )

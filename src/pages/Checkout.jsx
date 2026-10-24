@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { PageHeader } from '../components/DesignSystem'
 import { apiRequest } from '../services/api'
+import { formatINR } from '../utils/currency'
 
 const Checkout = () => {
   const navigate = useNavigate()
@@ -81,8 +82,8 @@ const Checkout = () => {
   }
 
   const subtotal = getTotalPrice()
-  const shipping = subtotal > 50 ? 0 : 9.99
-  const tax = subtotal * 0.08
+  const shipping = subtotal >= 4000 ? 0 : 499
+  const tax = subtotal * 0.18
   const total = subtotal + shipping + tax
 
   return (
@@ -317,7 +318,7 @@ const Checkout = () => {
                     <h4 className="text-sm font-medium text-gray-900">{item.name}</h4>
                     <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                   </div>
-                  <span className="text-sm font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                  <span className="text-sm font-medium">{formatINR(item.price * item.quantity)}</span>
                 </div>
               ))}
             </div>
@@ -325,19 +326,19 @@ const Checkout = () => {
             <div className="border-t border-gray-200 pt-4 space-y-2">
               <div className="flex justify-between">
                 <span className="text-gray-600">Subtotal</span>
-                <span className="font-medium">${subtotal.toFixed(2)}</span>
+                <span className="font-medium">{formatINR(subtotal)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Shipping</span>
-                <span className="font-medium">{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+                <span className="font-medium">{shipping === 0 ? 'Free' : formatINR(shipping)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Tax</span>
-                <span className="font-medium">${tax.toFixed(2)}</span>
+                <span className="font-medium">{formatINR(tax)}</span>
               </div>
               <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>{formatINR(total)}</span>
               </div>
             </div>
 

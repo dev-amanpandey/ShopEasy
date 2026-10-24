@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Trash2, ShoppingBag } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { PageHeader, QuantityStepper } from '../components/DesignSystem'
+import { formatINR } from '../utils/currency'
 
 const Cart = () => {
   const { items, updateQuantity, removeFromCart, getTotalPrice, clearCart } = useCart()
@@ -28,12 +29,12 @@ const Cart = () => {
     <>
     <PageHeader title="Shopping Cart" description={`${items.length} items in your cart`} />
     <div className="cart-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="cart-layout">
         {/* Cart Items */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="cart-items">
           {items.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex flex-col sm:flex-row gap-4">
+            <div key={item.id} className="cart-item bg-white rounded-lg shadow-md p-6">
+              <div className="cart-item-content">
                 <div className="flex-shrink-0">
                   <img
                     src={item.image}
@@ -42,13 +43,13 @@ const Cart = () => {
                   />
                 </div>
                 
-                <div className="flex-1 space-y-2">
+                <div className="cart-item-details flex-1 space-y-2">
                   <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
                   <p className="text-gray-600 text-sm">{item.category}</p>
-                  <p className="text-xl font-bold text-primary-600">${item.price}</p>
+                  <p className="text-xl font-bold text-primary-600">{formatINR(item.price)}</p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-end space-y-2 sm:space-y-0 sm:space-x-4">
+                <div className="cart-item-controls">
                   {/* Quantity Controls */}
                   <QuantityStepper value={item.quantity} min={0} onChange={(quantity) => updateQuantity(item.id, quantity)} />
 
@@ -66,7 +67,7 @@ const Cart = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Subtotal:</span>
                   <span className="text-lg font-semibold">
-                    ${(item.price * item.quantity).toFixed(2)}
+                    {formatINR(item.price * item.quantity)}
                   </span>
                 </div>
               </div>
@@ -85,32 +86,32 @@ const Cart = () => {
         </div>
 
         {/* Order Summary */}
-        <div className="lg:col-span-1">
+        <div className="cart-summary">
           <div className="bg-white rounded-lg shadow-md p-6 sticky top-8">
             <h2 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
             
             <div className="space-y-4">
               <div className="flex justify-between">
                 <span className="text-gray-600">Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
-                <span className="font-medium">${getTotalPrice().toFixed(2)}</span>
+                <span className="font-medium">{formatINR(getTotalPrice())}</span>
               </div>
               
               <div className="flex justify-between">
                 <span className="text-gray-600">Shipping</span>
                 <span className="font-medium">
-                  {getTotalPrice() > 50 ? 'Free' : '$9.99'}
+                  {getTotalPrice() >= 4000 ? 'Free' : formatINR(499)}
                 </span>
               </div>
               
               <div className="flex justify-between">
                 <span className="text-gray-600">Tax</span>
-                <span className="font-medium">${(getTotalPrice() * 0.08).toFixed(2)}</span>
+                <span className="font-medium">{formatINR(getTotalPrice() * 0.18)}</span>
               </div>
               
               <div className="border-t border-gray-200 pt-4">
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>${(getTotalPrice() + (getTotalPrice() > 50 ? 0 : 9.99) + (getTotalPrice() * 0.08)).toFixed(2)}</span>
+                  <span>{formatINR(getTotalPrice() + (getTotalPrice() >= 4000 ? 0 : 499) + (getTotalPrice() * 0.18))}</span>
                 </div>
               </div>
             </div>

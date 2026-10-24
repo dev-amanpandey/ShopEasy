@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Star, ShoppingCart } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { Button, Card } from './DesignSystem'
+import { formatINR } from '../utils/currency'
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart()
@@ -46,7 +47,7 @@ const ProductCard = ({ product }) => {
           
           <div className="flex items-center justify-between">
             <span className="text-2xl font-semibold text-primary-600">
-              ${product.price}
+              {formatINR(product.price)}
             </span>
             <Button
               onClick={handleAddToCart}

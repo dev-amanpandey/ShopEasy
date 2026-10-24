@@ -4,14 +4,18 @@ import { Star, ShoppingCart, Heart, Truck, Shield, RotateCcw } from 'lucide-reac
 import { useCart } from '../context/CartContext'
 import { products } from '../data/products'
 import { Breadcrumb } from '../components/DesignSystem'
+import { formatINR } from '../utils/currency'
+import { useWishlist } from '../context/WishlistContext'
 
 const ProductDetail = () => {
   const { id } = useParams()
   const { addToCart } = useCart()
+  const { productIds, isLoading: isWishlistLoading, error: wishlistError, notice: wishlistNotice, toggleProduct, reload: reloadWishlist } = useWishlist()
   const [product, setProduct] = useState(null)
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
-  const [isInWishlist, setIsInWishlist] = useState(false)
+  const [wishlistMessage, setWishlistMessage] = useState('')
+  const [isUpdatingWishlist, setIsUpdatingWishlist] = useState(false)
 
   useEffect(() => {
     const foundProduct = products.find(p => p.id === parseInt(id))
@@ -34,6 +38,19 @@ const ProductDetail = () => {
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
       addToCart(product)
+    }
+  }
+
+  const isInWishlist = productIds.includes(String(product.id))
+  const handleWishlistToggle = async () => {
+    setWishlistMessage('')
+    setIsUpdatingWishlist(true)
+    try {
+      await toggleProduct(product.id)
+    } catch (error) {
+      setWishlistMessage(error.message || 'Could not update your wishlist.')
+    } finally {
+      setIsUpdatingWishlist(false)
     }
   }
 
@@ -109,8 +126,8 @@ const ProductDetail = () => {
 
           <div className="border-t pt-6">
             <div className="flex items-baseline space-x-2 mb-6">
-              <span className="text-4xl font-bold text-primary-600">${product.price}</span>
-              <span className="text-gray-500 line-through">${(product.price * 1.2).toFixed(2)}</span>
+              <span className="text-4xl font-bold text-primary-600">{formatINR(product.price)}</span>
+              <span className="text-gray-500 line-through">{formatINR(product.price * 1.2)}</span>
               <span className="bg-red-100 text-red-800 text-sm font-medium px-2 py-1 rounded">
                 Save 17%
               </span>
@@ -145,7 +162,10 @@ const ProductDetail = () => {
                   <span>Add to Cart</span>
                 </button>
                 <button
-                  onClick={() => setIsInWishlist(!isInWishlist)}
+                  type="button"
+                  onClick={handleWishlistToggle}
+                  disabled={isUpdatingWishlist || isWishlistLoading || Boolean(wishlistError)}
+                  aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
                   className={`px-6 py-3 border-2 rounded-lg transition-colors ${
                     isInWishlist
                       ? 'border-red-500 text-red-500 bg-red-50'
@@ -155,6 +175,9 @@ const ProductDetail = () => {
                   <Heart className={`h-5 w-5 ${isInWishlist ? 'fill-current' : ''}`} />
                 </button>
               </div>
+              {wishlistMessage && <p className="text-sm text-red-500" role="alert">{wishlistMessage}{wishlistMessage === 'Sign in to save wishlist items.' && <> <Link to="/login" className="underline">Sign in</Link></>}</p>}
+              {wishlistError && <p className="text-sm text-red-500" role="alert">{wishlistError} <button type="button" onClick={reloadWishlist} className="underline">Try again</button></p>}
+              {wishlistNotice && <p className="text-sm text-gray-500" role="status">Saved on this device. Cloud wishlist sync will work once the ShopEasy backend is updated.</p>}
             </div>
           </div>
 
@@ -162,7 +185,7 @@ const ProductDetail = () => {
           <div className="border-t pt-6 space-y-4">
             <div className="flex items-center space-x-3">
               <Truck className="h-5 w-5 text-primary-600" />
-              <span className="text-gray-700">Free shipping on orders over $50</span>
+              <span className="text-gray-700">Free shipping on orders over {formatINR(4000)}</span>
             </div>
             <div className="flex items-center space-x-3">
               <Shield className="h-5 w-5 text-primary-600" />
@@ -215,7 +238,7 @@ const ProductDetail = () => {
                       </span>
                     </div>
                     <span className="text-xl font-bold text-primary-600">
-                      ${relatedProduct.price}
+                      {formatINR(relatedProduct.price)}
                     </span>
                   </div>
                 </div>

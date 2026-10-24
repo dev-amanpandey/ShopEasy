@@ -82,6 +82,32 @@ router.get('/me', protect, async (req, res) => {
   res.json({ user: req.user });
 });
 
+router.get('/wishlist', protect, async (req, res) => {
+  res.json({ wishlistProductIds: req.user.wishlistProductIds || [] });
+});
+
+router.put('/wishlist', protect, async (req, res) => {
+  const { productIds } = req.body;
+  if (!Array.isArray(productIds) || productIds.some((id) => !/^[1-9]\d*$/.test(String(id)))) {
+    return res.status(400).json({ message: 'Wishlist product IDs must be positive integers' });
+  }
+
+  try {
+    const wishlistProductIds = [...new Set(productIds.map(String))];
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $set: { wishlistProductIds } },
+      { new: true, runValidators: true }
+    ).select('wishlistProductIds');
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ wishlistProductIds: user.wishlistProductIds });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Could not update wishlist' });
+  }
+});
+
 // PUT /api/auth/profile
 router.put('/profile', protect, async (req, res) => {
   try {

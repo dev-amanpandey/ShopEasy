@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { apiRequest } from '../services/api'
+import { formatINR } from '../utils/currency'
 
 const AdminDashboard = () => {
   const { user, token } = useAuth()
@@ -27,7 +28,7 @@ const AdminDashboard = () => {
   const totalRevenue = orders.reduce((sum, order) => sum + Number(order.total || 0), 0)
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-12">
+    <div className="admin-dashboard max-w-5xl mx-auto px-4 py-12">
       <h1 className="text-3xl font-bold text-gray-900 mb-4">Admin Dashboard</h1>
       <p className="text-gray-700 mb-8">
         Welcome, <span className="font-semibold">{user?.name}</span>. This is a protected admin-only area.
@@ -38,10 +39,10 @@ const AdminDashboard = () => {
           {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
           {isLoading ? <p className="text-gray-600 text-sm" role="status">Loading orders…</p> : (
             <>
-              <p className="text-gray-600 text-sm">{orders.length} orders · ${totalRevenue.toFixed(2)} total order value</p>
+              <p className="text-gray-600 text-sm">{orders.length} orders · {formatINR(totalRevenue)} total order value</p>
               {orders.slice(0, 5).map((order) => (
                 <p key={order._id} className="mt-2 text-sm text-gray-600">
-                  {order._id} · {order.status} · ${Number(order.total).toFixed(2)}
+                  {order._id} · {order.status} · {formatINR(order.total)}
                 </p>
               ))}
               {!orders.length && !error && <p className="mt-2 text-sm text-gray-600">No orders yet.</p>}

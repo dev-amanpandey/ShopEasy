@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { PackageCheck, Truck, MapPin, Search } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { apiRequest } from '../services/api'
+import { formatINR } from '../utils/currency'
 
 const statusSteps = ['Processing', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered']
 
@@ -56,7 +57,7 @@ const OrderTracking = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10">
+    <div className="order-tracking-page max-w-5xl mx-auto px-4 py-10">
       <div className="bg-white rounded-2xl shadow-md p-6 md:p-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
@@ -131,7 +132,7 @@ const OrderTracking = () => {
                 <dl className="space-y-3 text-sm">
                   <div className="flex justify-between"><dt className="text-gray-500">Order ID</dt><dd className="font-medium text-gray-900">{order._id}</dd></div>
                   <div className="flex justify-between"><dt className="text-gray-500">Placed</dt><dd className="font-medium text-gray-900">{new Date(order.createdAt).toLocaleString()}</dd></div>
-                  <div className="flex justify-between"><dt className="text-gray-500">Total</dt><dd className="font-medium text-gray-900">${Number(order.total).toFixed(2)}</dd></div>
+                  <div className="flex justify-between"><dt className="text-gray-500">Total</dt><dd className="font-medium text-gray-900">{formatINR(order.total)}</dd></div>
                   <div className="flex justify-between"><dt className="text-gray-500">Payment</dt><dd className="font-medium text-gray-900">{order.paymentMethod}</dd></div>
                 </dl>
               </div>
@@ -161,7 +162,7 @@ const OrderTracking = () => {
                       <p className="font-semibold text-gray-900">{item.name}</p>
                       <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                     </div>
-                    <p className="font-semibold text-gray-900">${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="font-semibold text-gray-900">{formatINR(item.price * item.quantity)}</p>
                   </div>
                 ))}
               </div>

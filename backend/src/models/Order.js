@@ -93,7 +93,7 @@ const orderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['Processing', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered'],
+      enum: ['Processing', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],
       default: 'Processing',
     },
     trackingNumber: {
@@ -101,16 +101,44 @@ const orderSchema = new mongoose.Schema(
       unique: true,
       sparse: true,
     },
+    deliveredAt: {
+      type: Date,
+      default: null,
+    },
+    cancelledAt: {
+      type: Date,
+      default: null,
+    },
+    returnRequest: {
+      type: new mongoose.Schema({
+        status: { type: String, enum: ['Requested'], required: true },
+        requestedAt: { type: Date, required: true },
+      }, { _id: false }),
+      default: undefined,
+    },
   },
   { timestamps: true }
 );
 
 orderSchema.pre('validate', function preValidate(next) {
+  if (this.status === 'Delivered' && !this.deliveredAt && this.isModified('status')) {
+    this.deliveredAt = new Date();
+  }
   if (!this.trackingNumber) {
     this.trackingNumber = `SE-${Date.now().toString().slice(-8)}-${Math.random()
       .toString(36)
       .slice(2, 6)
       .toUpperCase()}`;
+  }
+  next();
+});
+
+orderSchema.pre('findOneAndUpdate', function setDeliveredAt(next) {
+  const update = this.getUpdate() || {};
+  const status = update.status || update.$set?.status;
+  const deliveredAt = update.deliveredAt || update.$set?.deliveredAt;
+  if (status === 'Delivered' && !deliveredAt) {
+    this.setUpdate({ ...update, $set: { ...update.$set, deliveredAt: new Date() } });
   }
   next();
 });

@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    wishlistProductIds: {
+      type: [String],
+      default: [],
+    },
   },
   { timestamps: true }
 );

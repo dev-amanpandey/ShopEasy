@@ -4,6 +4,7 @@ import { Truck, ShieldCheck, Headphones, MapPin, Phone, Mail, PackageCheck, Rota
 import { Input, PageHeader } from '../components/DesignSystem'
 import { useAuth } from '../context/AuthContext'
 import { apiRequest } from '../services/api'
+import { formatINR } from '../utils/currency'
 
 const Content = ({ children, className = '' }) => <div className={`shopeasy-main ${className}`}>{children}</div>
 
@@ -19,8 +20,8 @@ export const CategoriesPage = () => {
 }
 
 const infoPageContent = {
-  Shipping: { title: 'Shipping Info', intro: 'What shipping costs and when your order arrives.', rows: [['Free shipping', 'Orders over $50 ship free.'], ['Orders under $50', 'A shipping fee applies and is shown at checkout before you pay.'], ['Delivery times', '[DELIVERY TIME ESTIMATES]'], ['Where we deliver', '[DELIVERY AREAS]'] ] },
-  Returns: { title: 'Returns', intro: 'Simple, 30-day returns on every order.', rows: [['30-day return policy', 'Not right for you? Return your order within 30 days.'], ['2-year warranty included', 'Products come with a 2-year warranty at no extra cost.'], ['How to start a return', '[DESCRIBE YOUR RETURN PROCESS]'] ] },
+  Shipping: { title: 'Shipping Info', intro: 'What shipping costs and when your order arrives.', rows: [['Free shipping', `Orders over ${formatINR(4000)} ship free.`], ['Orders under ₹4,000', `A ${formatINR(499)} shipping fee applies and is shown at checkout before you pay.`], ['Delivery times', 'Orders usually arrive within 3–7 business days after dispatch. Remote areas and peak periods may take longer.'], ['Where we deliver', 'We deliver to serviceable PIN codes across India. Enter your PIN code at checkout to check availability.'] ] },
+  Returns: { title: 'Returns', intro: 'Eligible items can be returned within 7 days of delivery.', rows: [['7-day return policy', 'Return eligible items within 7 days of delivery.'], ['2-year warranty included', 'Products come with a 2-year warranty at no extra cost.'], ['How to start a return', 'Open My Orders within 7 days of delivery, select the eligible order, then choose Return. You can track your return there.'] ] },
 }
 
 export const PolicyPage = ({ type }) => {
@@ -30,11 +31,11 @@ export const PolicyPage = ({ type }) => {
 }
 
 const faqItems = [
-  ['Is shipping free?', 'Yes, on orders over $50. Smaller orders pay a shipping fee that is shown at checkout.'],
-  ['What is your return policy?', 'You can return an order within 30 days.'],
+  ['Is shipping free?', `Yes, on orders over ${formatINR(4000)}. Smaller orders pay a ${formatINR(499)} shipping fee shown at checkout.`],
+  ['What is your return policy?', 'You can return an eligible order within 7 days of delivery from My Orders, where you can also track the return.'],
   ['Do products come with a warranty?', 'Yes. Every product includes a 2-year warranty.'],
   ['Is my payment information safe?', 'Yes. Checkout is secure and your payment information is encrypted.'],
-  ['How long will delivery take?', '[DELIVERY TIME ESTIMATES]'],
+  ['How long will delivery take?', 'Orders usually arrive within 3–7 business days after dispatch. Remote areas and peak periods may take longer.'],
   ['How do I contact you?', 'Email info@shopeasy.com or call +1 (555) 123-4567.'],
 ]
 export const FAQPage = () => <><PageHeader title="FAQ" description="Quick answers to the questions we hear most." /><Content><div className="faq-list">{faqItems.map(([question, answer]) => <details key={question}><summary>{question}</summary><p className={answer.startsWith('[') ? 'accent-copy' : ''}>{answer}</p></details>)}</div></Content></>
@@ -87,5 +88,5 @@ export const OrderConfirmationPage = () => {
     ? `${shipping.firstName} ${shipping.lastName}, ${shipping.address}, ${shipping.city}, ${shipping.state} ${shipping.zipCode}`
     : '[SHIPPING ADDRESS FROM CHECKOUT]'
 
-  return <><section className="shopeasy-page-header"><div className="confirmation-header"><span className="confirmation-icon"><CheckCircle2 /></span><h1>Thank you for your order</h1><p>We've received your order and it is on its way to being packed.</p></div></section><Content className="confirmation-page">{isLoading && <p role="status">Loading your order…</p>}{error && <p className="accent-copy" role="alert">{error}</p>}{order && <><div className="confirmation-grid"><section className="confirmation-card"><h2>Order details</h2><dl>{[['Order number', order._id], ['Estimated delivery', '[ESTIMATED DELIVERY DATE]'], ['Shipping to', shippingAddress], ['Payment', order.paymentMethod || 'Card'], ['Confirmation sent to', shipping?.email || '[EMAIL FROM CHECKOUT]']].map(([key, value]) => <div key={key}><dt>{key}</dt><dd>{value}</dd></div>)}</dl></section><aside className="confirmation-card"><h2>Order Summary</h2><ul className="confirmation-items">{order.items.map((item) => <li key={item.id}><img src={item.image} alt={item.name} /><div><strong>{item.name}</strong><span>Qty: {item.quantity}</span></div><b>${(item.price * item.quantity).toFixed(2)}</b></li>)}</ul><div className="confirmation-total"><span>Total</span><strong>${Number(order.total).toFixed(2)}</strong></div></aside></div><div className="confirmation-actions"><Link className="shopeasy-button" to="/products">Continue Shopping</Link><Link className="shopeasy-button-outline" to="/profile">View My Orders</Link></div></>}</Content></>
+  return <><section className="shopeasy-page-header"><div className="confirmation-header"><span className="confirmation-icon"><CheckCircle2 /></span><h1>Thank you for your order</h1><p>We've received your order and it is on its way to being packed.</p></div></section><Content className="confirmation-page">{isLoading && <p role="status">Loading your order…</p>}{error && <p className="accent-copy" role="alert">{error}</p>}{order && <><div className="confirmation-grid"><section className="confirmation-card"><h2>Order details</h2><dl>{[['Order number', order._id], ['Estimated delivery', '[ESTIMATED DELIVERY DATE]'], ['Shipping to', shippingAddress], ['Payment', order.paymentMethod || 'Card'], ['Confirmation sent to', shipping?.email || '[EMAIL FROM CHECKOUT]']].map(([key, value]) => <div key={key}><dt>{key}</dt><dd>{value}</dd></div>)}</dl></section><aside className="confirmation-card"><h2>Order Summary</h2><ul className="confirmation-items">{order.items.map((item) => <li key={item.id}><img src={item.image} alt={item.name} /><div><strong>{item.name}</strong><span>Qty: {item.quantity}</span></div><b>{formatINR(item.price * item.quantity)}</b></li>)}</ul><div className="confirmation-total"><span>Total</span><strong>{formatINR(order.total)}</strong></div></aside></div><div className="confirmation-actions"><Link className="shopeasy-button" to="/products">Continue Shopping</Link><Link className="shopeasy-button-outline" to="/profile">View My Orders</Link></div></>}</Content></>
 }

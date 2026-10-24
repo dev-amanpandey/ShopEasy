@@ -1,11 +1,17 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Package, UserCircle } from 'lucide-react'
+﻿import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useRef } from 'react'
+import { Heart, Package, UserCircle } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { PageHeader } from '../components/DesignSystem'
 import { apiRequest } from '../services/api'
+import { formatINR } from '../utils/currency'
+import { useWishlist } from '../context/WishlistContext'
+import { products } from '../data/products'
 
 const Profile = () => {
   const { user, token, updateProfile } = useAuth()
+  const { productIds, isLoading: isLoadingWishlist, error: wishlistError, notice: wishlistNotice, removeProduct, reload: reloadWishlist } = useWishlist()
 
   const [formData, setFormData] = useState({
     name: '',
@@ -15,12 +21,15 @@ const Profile = () => {
     avatar: '',
   })
   const [orders, setOrders] = useState([])
-  const [trackingId, setTrackingId] = useState('')
-  const [trackedOrder, setTrackedOrder] = useState(null)
-  const [trackingError, setTrackingError] = useState('')
-  const [selectedOrderId, setSelectedOrderId] = useState(null)
-  const [isTracking, setIsTracking] = useState(false)
-  const [isLoadingOrders, setIsLoadingOrders] = useState(false)
+  const [activeSection, setActiveSection] = useState('profile')
+  const [isLoadingOrders, setIsLoadingOrders] = useState(true)
+  const [orderError, setOrderError] = useState('')
+  const [orderActionMessage, setOrderActionMessage] = useState('')
+  const [orderActionError, setOrderActionError] = useState('')
+  const [actingOrderId, setActingOrderId] = useState('')
+  const [isUpdatingWishlist, setIsUpdatingWishlist] = useState(false)
+  const [wishlistActionError, setWishlistActionError] = useState('')
+  const ordersRequestVersion = useRef(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -37,25 +46,31 @@ const Profile = () => {
     }))
   }, [user])
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      if (!token) return
-
-      setIsLoadingOrders(true)
-      try {
-        const data = await apiRequest('/api/orders/mine', { token })
-
-        setOrders(data.orders || [])
-      } catch (err) {
-        setOrders([])
-        setError(err.message || 'Could not load your orders')
-      } finally {
-        setIsLoadingOrders(false)
-      }
+  const loadOrders = useCallback(async () => {
+    const version = ++ordersRequestVersion.current
+    if (!token) {
+      setOrders([])
+      setOrderError('Please sign in to view your orders.')
+      setIsLoadingOrders(false)
+      return
     }
 
-    fetchOrders()
+    setIsLoadingOrders(true)
+    setOrderError('')
+    try {
+      const data = await apiRequest('/api/orders/mine', { token })
+      if (version === ordersRequestVersion.current) setOrders(data.orders || [])
+    } catch (err) {
+      if (version === ordersRequestVersion.current) {
+        setOrders([])
+        setOrderError(err.message || 'Could not load your orders')
+      }
+    } finally {
+      if (version === ordersRequestVersion.current) setIsLoadingOrders(false)
+    }
   }, [token])
+
+  useEffect(() => { loadOrders() }, [loadOrders])
 
   const avatarInitial = useMemo(() => {
     if (!formData.name) return 'U'
@@ -111,98 +126,53 @@ const Profile = () => {
     }
   }
 
-  const handleTrackOrder = async (e) => {
-    e.preventDefault()
-    if (!trackingId.trim() || !token) {
-      setTrackingError('Please enter a valid order ID or sign in.')
-      return
-    }
-
-    setIsTracking(true)
-    setTrackingError('')
-    setTrackedOrder(null)
-
+  const handleOrderAction = async (order, action) => {
+    setActingOrderId(order._id)
+    setOrderActionError('')
+    setOrderActionMessage('')
     try {
-      const data = await apiRequest(`/api/orders/${encodeURIComponent(trackingId.trim())}`, { token })
-
-      setTrackedOrder(data.order)
+      const actionData = await apiRequest(`/api/orders/${encodeURIComponent(order._id)}/${action}`, { method: 'POST', token })
+      if (actionData.order) setOrders((current) => current.map((savedOrder) => savedOrder._id === order._id ? actionData.order : savedOrder))
+      try {
+        const detailData = await apiRequest(`/api/orders/${encodeURIComponent(order._id)}`, { token })
+        setOrders((current) => current.map((savedOrder) => savedOrder._id === order._id ? detailData.order : savedOrder))
+      } catch {
+        const savedStatus = actionData.order?.status || 'updated'
+        setOrderActionMessage(`The action was saved. The order's saved status is ${savedStatus}, but a fresh detail could not be loaded.`)
+        return
+      }
+      setOrderActionMessage(action === 'cancel'
+        ? `Order ${order._id} was cancelled.`
+        : `Return request for order ${order._id} was saved. No refund has been processed.`)
     } catch (err) {
-      setTrackingError(err.message || 'Unable to track your order')
+      setOrderActionError(err.message || 'Could not update this order')
     } finally {
-      setIsTracking(false)
+      setActingOrderId('')
     }
   }
 
-  const statusSteps = ['Processing', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered']
+  const handleWishlistRemove = async (productId) => {
+    setWishlistActionError('')
+    setIsUpdatingWishlist(true)
+    try {
+      await removeProduct(productId)
+    } catch (err) {
+      setWishlistActionError(err.message || 'Could not remove this item')
+    } finally {
+      setIsUpdatingWishlist(false)
+    }
+  }
 
-  const renderOrderDetails = (order) => {
-    if (!order) return null
-
-    const currentIndex = statusSteps.indexOf(order.status)
-
-    return (
-      <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-gray-500">Tracking number</p>
-            <p className="font-semibold text-gray-900">{order.trackingNumber}</p>
-          </div>
-          <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
-            {order.status}
-          </span>
-        </div>
-
-        <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-5 mb-5">
-          {statusSteps.map((step, index) => {
-            const isDone = index <= currentIndex
-            return (
-              <div
-                key={step}
-                className={`rounded-lg border px-2 py-2 text-center text-xs font-medium ${
-                  isDone ? 'border-primary-200 bg-primary-50 text-primary-700' : 'border-gray-200 bg-white text-gray-400'
-                }`}
-              >
-                {step}
-              </div>
-            )
-          })}
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <h4 className="text-sm font-semibold text-gray-800 mb-2">Items</h4>
-            <div className="space-y-3">
-              {order.items?.map((item) => (
-                <div key={`${order._id}-${item.id}`} className="flex items-center gap-3 rounded-lg bg-white p-2 border border-gray-200">
-                  <img src={item.image} alt={item.name} className="h-12 w-12 rounded object-cover" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
-                    <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
-                  </div>
-                  <p className="text-sm font-semibold text-gray-900">${(Number(item.price) * Number(item.quantity)).toFixed(2)}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h4 className="text-sm font-semibold text-gray-800 mb-2">Shipping & payment</h4>
-            <div className="rounded-lg bg-white border border-gray-200 p-3 text-sm text-gray-700 space-y-2">
-              <p>
-                {order.shippingAddress?.firstName} {order.shippingAddress?.lastName}
-              </p>
-              <p>{order.shippingAddress?.address}</p>
-              <p>
-                {order.shippingAddress?.city}, {order.shippingAddress?.state} {order.shippingAddress?.zipCode}
-              </p>
-              <p>{order.shippingAddress?.email}</p>
-              <p>Payment: {order.paymentMethod || 'Card'}</p>
-              <p className="font-semibold text-gray-900">Total: ${Number(order.total).toFixed(2)}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+  const wishlistProducts = products.filter((product) => productIds.includes(String(product.id)))
+  const orderAddress = (address = {}) => [
+    `${address.firstName || ''} ${address.lastName || ''}`.trim(),
+    address.address,
+    [address.city, address.state, address.zipCode].filter(Boolean).join(', '),
+  ].filter(Boolean).join(', ')
+  const canCancelOrder = (order) => ['Processing', 'Packed'].includes(order.status)
+  const canRequestReturn = (order) => {
+    if (order.status !== 'Delivered' || !order.deliveredAt || order.returnRequest) return false
+    return Date.now() <= new Date(order.deliveredAt).getTime() + 7 * 24 * 60 * 60 * 1000
   }
 
   return (
@@ -212,6 +182,7 @@ const Profile = () => {
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         <section className="xl:col-span-2 bg-white rounded-2xl shadow-md p-6 md:p-8">
+          {activeSection === 'profile' && <>
           <div className="flex items-center gap-3 mb-6">
             <UserCircle className="h-6 w-6 text-primary-600" />
             <h2 className="text-2xl font-bold text-gray-900">Profile</h2>
@@ -325,52 +296,72 @@ const Profile = () => {
               </form>
             </div>
           </div>
+          </>}
+          {activeSection === 'orders' && <>
+            <div className="mb-6 flex items-center gap-3"><Package className="h-6 w-6 text-primary-600" /><h2 className="text-2xl font-bold text-gray-900">My Orders</h2></div>
+            {orderActionError && <p className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700" role="alert">{orderActionError}</p>}
+            {orderActionMessage && <p className="mb-4 rounded-md bg-green-50 p-3 text-sm text-green-700" role="status">{orderActionMessage}</p>}
+            {isLoadingOrders ? <p className="text-sm text-gray-500" role="status">Loading your ordersâ€¦</p> : orderError ? (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert"><p>{orderError}</p><button type="button" onClick={loadOrders} className="mt-3 underline">Try again</button></div>
+            ) : orders.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-gray-200 bg-gray-50 p-5 text-sm text-gray-600"><p>You havenâ€™t placed any orders yet.</p><Link to="/products" className="mt-3 inline-block text-primary-600 underline">Browse products</Link></div>
+            ) : (
+              <div className="space-y-5">{orders.map((order) => (
+                <article key={order._id} className="rounded-xl border border-gray-200 p-4 md:p-5">
+                  <div className="flex flex-wrap items-start justify-between gap-3 border-b border-gray-200 pb-4">
+                    <div className="min-w-0"><p className="text-xs uppercase tracking-wide text-gray-500">Order number</p><p className="break-all font-semibold text-gray-900">{order._id}</p><p className="mt-1 text-sm text-gray-600">Placed {new Date(order.createdAt).toLocaleDateString()}</p>{order.deliveredAt && <p className="text-sm text-gray-600">Delivered {new Date(order.deliveredAt).toLocaleDateString()}</p>}</div>
+                    <span className="inline-flex rounded-full border border-gray-200 px-3 py-1 text-sm font-medium text-gray-900">{order.status}</span>
+                  </div>
+                  <div className="grid gap-5 py-4 md:grid-cols-2">
+                    <div><h3 className="mb-3 font-semibold text-gray-900">Items</h3><ul className="space-y-3">{order.items?.map((item) => (
+                      <li key={`${order._id}-${item.id}`} className="flex min-w-0 items-center gap-3"><img src={item.image} alt="" className="h-14 w-14 flex-none object-cover" /><div className="min-w-0 flex-1"><p className="break-words font-medium text-gray-900">{item.name}</p><p className="text-sm text-gray-500">Qty: {item.quantity} Â· {formatINR(item.price)} each</p></div><p className="text-right text-sm font-semibold text-gray-900">{formatINR(Number(item.price) * Number(item.quantity))}</p></li>
+                    ))}</ul></div>
+                    <div><h3 className="mb-3 font-semibold text-gray-900">Shipping address</h3><p className="text-sm leading-6 text-gray-600">{orderAddress(order.shippingAddress)}</p>{order.shippingAddress?.phone && <p className="text-sm text-gray-600">{order.shippingAddress.phone}</p>}<p className="mt-3 font-semibold text-gray-900">Order total: {formatINR(order.total)}</p></div>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 pt-4 text-sm"><div><p className="font-medium text-gray-900">Tracking: {order.trackingNumber || 'Not available'}</p>{order.status !== 'Cancelled' && <Link to={`/track-order?id=${encodeURIComponent(order._id)}`} className="mt-1 inline-block text-primary-600 underline">View tracking details</Link>}</div><div className="flex flex-wrap gap-2">
+                    {canCancelOrder(order) && <button type="button" onClick={() => handleOrderAction(order, 'cancel')} disabled={actingOrderId === order._id} className="rounded border border-gray-300 px-3 py-2 text-gray-900 disabled:opacity-60">{actingOrderId === order._id ? 'Please waitâ€¦' : 'Cancel order'}</button>}
+                    {order.status === 'Delivered' && !order.returnRequest && canRequestReturn(order) && <button type="button" onClick={() => handleOrderAction(order, 'return')} disabled={actingOrderId === order._id} className="rounded border border-primary-600 px-3 py-2 text-primary-700 disabled:opacity-60">{actingOrderId === order._id ? 'Please waitâ€¦' : 'Request return'}</button>}
+                  </div></div>
+                  {order.status === 'Delivered' && !order.deliveredAt && <p className="mt-3 text-sm text-gray-500">Delivery date is unavailable, so return eligibility cannot be confirmed. Please contact support.</p>}
+                  {order.status === 'Delivered' && order.deliveredAt && !order.returnRequest && !canRequestReturn(order) && <p className="mt-3 text-sm text-gray-500">The 7-day return window has closed.</p>}
+                  {order.returnRequest && <p className="mt-3 rounded bg-gray-50 p-3 text-sm text-gray-700">Return request {order.returnRequest.status?.toLowerCase()} on {new Date(order.returnRequest.requestedAt).toLocaleDateString()}. This is a request only; no refund has been processed.</p>}
+                  {order.cancelledAt && <p className="mt-3 text-sm text-gray-500">Cancelled on {new Date(order.cancelledAt).toLocaleDateString()}.</p>}
+                </article>
+              ))}</div>
+            )}
+          </>}
+          {activeSection === 'wishlist' && <>
+            <div className="mb-6 flex items-center gap-3"><Heart className="h-6 w-6 text-primary-600" /><h2 className="text-2xl font-bold text-gray-900">Wishlist</h2></div>
+            {wishlistNotice && <p className="mb-4 border border-primary-600/30 bg-primary-100/10 p-3 text-sm text-gray-700" role="status">{wishlistNotice}</p>}
+            {(wishlistError || wishlistActionError) && <p className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700" role="alert">{wishlistActionError || wishlistError}</p>}
+            {isLoadingWishlist ? <p className="text-sm text-gray-500" role="status">Loading your wishlistâ€¦</p> : wishlistError ? (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert"><p>{wishlistError}</p><button type="button" onClick={reloadWishlist} className="mt-3 underline">Try again</button></div>
+            ) : wishlistProducts.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-gray-200 bg-gray-50 p-5 text-sm text-gray-600"><p>Your wishlist is empty. Save products youâ€™d like to revisit.</p><Link to="/products" className="mt-3 inline-block text-primary-600 underline">Browse products</Link></div>
+            ) : <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">{wishlistProducts.map((product) => (
+              <article key={product.id} className="flex min-w-0 items-center gap-4 border border-gray-200 p-4"><Link to={`/products/${product.id}`} className="h-20 w-20 flex-none overflow-hidden"><img src={product.image} alt={product.name} className="h-full w-full object-cover" /></Link><div className="min-w-0 flex-1"><Link to={`/products/${product.id}`} className="break-words font-semibold text-gray-900 hover:text-primary-600">{product.name}</Link><p className="mt-1 text-primary-600">{formatINR(product.price)}</p><button type="button" onClick={() => handleWishlistRemove(product.id)} disabled={isUpdatingWishlist} className="mt-2 text-sm text-gray-600 underline disabled:opacity-60">Remove</button></div></article>
+            ))}</div>}
+          </>}
         </section>
 
         <aside className="bg-white rounded-2xl shadow-md p-6 md:p-8">
           <div className="flex items-center gap-3 mb-6">
-            <Package className="h-6 w-6 text-primary-600" />
-            <h2 className="text-2xl font-bold text-gray-900">My Orders</h2>
+            <UserCircle className="h-6 w-6 text-primary-600" />
+            <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
           </div>
-
-          {isLoadingOrders ? (
-            <div className="text-sm text-gray-500">Loading orders...</div>
-          ) : orders.length === 0 ? (
-            <div className="rounded-lg bg-gray-50 border border-dashed border-gray-200 p-4 text-sm text-gray-600">
-              No orders yet.
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {orders.map((order) => {
-                const isSelected = selectedOrderId === order._id
-
-                return (
-                  <div key={order._id} className="border border-gray-200 rounded-xl p-4">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedOrderId(isSelected ? null : order._id)}
-                      className="w-full text-left"
-                    >
-                      <div className="flex items-center justify-between gap-3 mb-2">
-                        <p className="font-semibold text-gray-900">#{order.trackingNumber || order._id.slice(-6)}</p>
-                        <span className="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
-                          {order.status}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        {new Date(order.createdAt).toLocaleDateString()} · ${Number(order.total).toFixed(2)}
-                      </p>
-                      <p className="mt-2 text-sm text-gray-500">
-                        {order.items?.length || 0} item{(order.items?.length || 0) !== 1 ? 's' : ''}
-                      </p>
-                    </button>
-
-                    {isSelected && renderOrderDetails(order)}
-                  </div>
-                )
-              })}
-            </div>
-          )}
+          <nav className="flex flex-col gap-2" aria-label="Dashboard sections">
+            {[
+              ['profile', 'Profile', UserCircle],
+              ['orders', 'My Orders', Package],
+              ['wishlist', 'Wishlist', Heart],
+            ].map(([section, label, Icon]) => (
+              <button key={section} type="button" onClick={() => setActiveSection(section)} aria-current={activeSection === section ? 'page' : undefined}
+                className={`flex items-center gap-3 border px-4 py-3 text-left transition-colors ${activeSection === section ? 'border-primary-600 bg-primary-100 text-primary-700' : 'border-gray-200 text-gray-700 hover:border-primary-600'}`}>
+                <Icon className="h-5 w-5 flex-none" />
+                <span>{label}</span>
+              </button>
+            ))}
+          </nav>
         </aside>
       </div>
     </div>

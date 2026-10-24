@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useReducer } from 'react'
+import { products } from '../data/products'
 
 const CartContext = createContext()
 
@@ -53,7 +54,14 @@ export const CartProvider = ({ children }) => {
     if (typeof window === 'undefined') return { items: [] }
     try {
       const savedCart = JSON.parse(window.localStorage.getItem('cart_items') || '[]')
-      return { items: Array.isArray(savedCart) ? savedCart : [] }
+      const currentProducts = new Map(products.map((product) => [product.id, product]))
+      const items = Array.isArray(savedCart)
+        ? savedCart.map((item) => {
+            const currentProduct = currentProducts.get(item.id)
+            return currentProduct ? { ...item, ...currentProduct, quantity: item.quantity } : item
+          })
+        : []
+      return { items }
     } catch {
       return { items: [] }
     }

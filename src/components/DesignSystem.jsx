@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export const Button = ({ variant = 'gold', as: Component = 'button', className = '', ...props }) => (
   <Component className={`${variant === 'outline' ? 'shopeasy-button-outline' : 'shopeasy-button'} ${className}`} {...props} />
 )

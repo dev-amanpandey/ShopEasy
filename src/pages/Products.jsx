@@ -22,15 +22,16 @@ const Products = () => {
     }
 
     // Filter by search query
-    if (searchQuery) {
+    const normalizedQuery = searchQuery.trim().toLowerCase()
+    if (normalizedQuery) {
       filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchQuery.toLowerCase())
+        product.name.toLowerCase().includes(normalizedQuery) ||
+        product.description.toLowerCase().includes(normalizedQuery)
       )
     }
 
     // Sort products
-    filtered.sort((a, b) => {
+    filtered = [...filtered].sort((a, b) => {
       switch (sortBy) {
         case 'price-low':
           return a.price - b.price
@@ -60,8 +61,8 @@ const Products = () => {
   useEffect(() => {
     const category = searchParams.get('category')
     const search = searchParams.get('search')
-    if (category) setSelectedCategory(category)
-    if (search) setSearchQuery(search)
+    setSelectedCategory(category || 'all')
+    setSearchQuery(search || '')
   }, [searchParams])
 
   return (
