@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { Filter, Grid, List } from 'lucide-react'
 import ProductGrid from '../components/ProductGrid'
 import { products, categories } from '../data/products'
+import { PageHeader } from '../components/DesignSystem'
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -64,9 +65,10 @@ const Products = () => {
   }, [searchParams])
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Products</h1>
+    <>
+      <PageHeader title="Products" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mb-8 products-search-row">
         
         {/* Search Bar */}
         <div className="max-w-md">
@@ -173,7 +175,8 @@ const Products = () => {
           <ProductGrid products={filteredProducts} />
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
 

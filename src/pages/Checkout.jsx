@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { CreditCard, Lock, ArrowLeft } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
+import { PageHeader } from '../components/DesignSystem'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
 
@@ -95,7 +96,9 @@ const Checkout = () => {
   const total = subtotal + shipping + tax
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <>
+      <PageHeader title="Checkout" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 checkout-page">
       <div className="mb-8">
         <Link
           to="/cart"
@@ -104,7 +107,6 @@ const Checkout = () => {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Cart
         </Link>
-        <h1 className="text-3xl font-bold text-gray-900">Checkout</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -369,7 +371,8 @@ const Checkout = () => {
           </div>
         </div>
       </form>
-    </div>
+      </div>
+    </>
   )
 }
 

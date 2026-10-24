@@ -35,9 +35,9 @@ const Signup = () => {
   }
 
   return (
-    <div className="min-h-[60vh] flex items-center justify-center px-4 py-12">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-md p-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Create your account</h2>
+    <div className="auth-page min-h-[60vh] flex items-center justify-center px-4 py-12">
+      <div className="auth-card max-w-md w-full bg-white rounded-xl shadow-md p-8">
+        <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">Create your account</h1>
         {error && (
           <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700">
             {error}

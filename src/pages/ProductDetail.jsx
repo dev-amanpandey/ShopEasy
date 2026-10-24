@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { Star, ShoppingCart, Heart, Truck, Shield, RotateCcw } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { products } from '../data/products'
+import { Breadcrumb } from '../components/DesignSystem'
 
 const ProductDetail = () => {
   const { id } = useParams()
@@ -50,20 +51,12 @@ const ProductDetail = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Breadcrumb */}
-      <nav className="mb-8">
-        <ol className="flex items-center space-x-2 text-sm text-gray-500">
-          <li><Link to="/" className="hover:text-primary-600">Home</Link></li>
-          <li>/</li>
-          <li><Link to="/products" className="hover:text-primary-600">Products</Link></li>
-          <li>/</li>
-          <li className="text-gray-900">{product.name}</li>
-        </ol>
-      </nav>
+      <Breadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Products', to: '/products' }, { label: product.name }]} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* Product Images */}
         <div className="space-y-4">
-          <div className="aspect-square overflow-hidden rounded-lg">
+          <div className="product-detail-image aspect-square overflow-hidden">
             <img
               src={images[selectedImage]}
               alt={product.name}

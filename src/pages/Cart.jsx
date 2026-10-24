@@ -1,13 +1,14 @@
 import { Link } from 'react-router-dom'
-import { Plus, Minus, Trash2, ShoppingBag } from 'lucide-react'
+import { Trash2, ShoppingBag } from 'lucide-react'
 import { useCart } from '../context/CartContext'
+import { PageHeader, QuantityStepper } from '../components/DesignSystem'
 
 const Cart = () => {
   const { items, updateQuantity, removeFromCart, getTotalPrice, clearCart } = useCart()
 
   if (items.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="cart-empty max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center">
           <ShoppingBag className="h-24 w-24 text-gray-300 mx-auto mb-6" />
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h1>
@@ -24,12 +25,9 @@ const Cart = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Shopping Cart</h1>
-        <p className="text-gray-600">{items.length} items in your cart</p>
-      </div>
-
+    <>
+    <PageHeader title="Shopping Cart" description={`${items.length} items in your cart`} />
+    <div className="cart-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Cart Items */}
         <div className="lg:col-span-2 space-y-4">
@@ -52,23 +50,7 @@ const Cart = () => {
 
                 <div className="flex flex-col sm:flex-row items-end space-y-2 sm:space-y-0 sm:space-x-4">
                   {/* Quantity Controls */}
-                  <div className="flex items-center border border-gray-300 rounded-lg">
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="px-3 py-2 text-gray-600 hover:text-gray-800"
-                    >
-                      <Minus className="h-4 w-4" />
-                    </button>
-                    <span className="px-4 py-2 border-x border-gray-300 min-w-[3rem] text-center">
-                      {item.quantity}
-                    </span>
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="px-3 py-2 text-gray-600 hover:text-gray-800"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </button>
-                  </div>
+                  <QuantityStepper value={item.quantity} min={0} onChange={(quantity) => updateQuantity(item.id, quantity)} />
 
                   {/* Remove Button */}
                   <button
@@ -165,6 +147,7 @@ const Cart = () => {
         </div>
       </div>
     </div>
+    </>
   )
 }
 
