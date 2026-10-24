@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Package, UserCircle } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { PageHeader } from '../components/DesignSystem'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
 
@@ -224,10 +225,9 @@ const Profile = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">User Dashboard</h1>
-      </div>
+    <>
+    <PageHeader title="User Dashboard" />
+    <div className="max-w-7xl mx-auto px-4 py-10 dashboard-page">
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         <section className="xl:col-span-2 bg-white rounded-2xl shadow-md p-6 md:p-8">
@@ -393,6 +393,7 @@ const Profile = () => {
         </aside>
       </div>
     </div>
+    </>
   )
 }
 
