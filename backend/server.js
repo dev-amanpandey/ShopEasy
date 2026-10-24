@@ -20,13 +20,44 @@ dotenv.config();
 
 const app = express();
 
+const normalizeOrigin = (value) => {
+  try {
+    return new URL(value).origin;
+  } catch {
+    return null;
+  }
+};
+
+const isLocalDevelopmentOrigin = (value) => {
+  try {
+    const { protocol, hostname } = new URL(value);
+    return protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(hostname);
+  } catch {
+    return false;
+  }
+};
+
+const allowedOrigins = new Set(
+  [
+    ...(process.env.CLIENT_ORIGIN || '').split(','),
+    'https://e-commerce-lac-beta-32.vercel.app',
+  ]
+    .map((origin) => normalizeOrigin(origin.trim()))
+    .filter(Boolean)
+);
+
 // Connect to MongoDB
 connectDB();
 
 // Middleware
 app.use(
   cors({
-    origin: [process.env.CLIENT_ORIGIN || 'http://localhost:5173', 'https://e-commerce-lac-beta-32.vercel.app/'],
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.has(normalizeOrigin(origin)) || isLocalDevelopmentOrigin(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('Origin is not allowed by CORS'));
+    },
     credentials: true,
   })
 );

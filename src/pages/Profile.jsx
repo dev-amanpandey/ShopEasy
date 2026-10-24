@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Package, UserCircle } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { PageHeader } from '../components/DesignSystem'
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
+import { apiRequest } from '../services/api'
 
 const Profile = () => {
   const { user, token, updateProfile } = useAuth()
@@ -44,21 +43,12 @@ const Profile = () => {
 
       setIsLoadingOrders(true)
       try {
-        const response = await fetch(`${API_BASE_URL}/api/orders/mine`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-
-        const data = await response.json()
-
-        if (!response.ok) {
-          throw new Error(data.message || 'Could not load your orders')
-        }
+        const data = await apiRequest('/api/orders/mine', { token })
 
         setOrders(data.orders || [])
       } catch (err) {
         setOrders([])
+        setError(err.message || 'Could not load your orders')
       } finally {
         setIsLoadingOrders(false)
       }
@@ -133,16 +123,7 @@ const Profile = () => {
     setTrackedOrder(null)
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/orders/${trackingId.trim()}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-
-      const data = await response.json()
-      if (!response.ok) {
-        throw new Error(data.message || 'Order not found')
-      }
+      const data = await apiRequest(`/api/orders/${encodeURIComponent(trackingId.trim())}`, { token })
 
       setTrackedOrder(data.order)
     } catch (err) {

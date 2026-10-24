@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ShopEasy Products</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0e171b;font-family:'Josefin Sans',system-ui,sans-serif;color:#e8edf4}
+a{text-decoration:none;color:inherit}
+.nav-link{opacity:.88;transition:opacity .2s}
+.nav-link:hover{opacity:1}
+.field:focus,.field:focus-visible{outline:2px solid #d1a063;outline-offset:2px}
+.foot-link{opacity:.8;transition:opacity .2s}
+.foot-link:hover{opacity:1}
+.card{transition:transform .25s, border-color .25s}
+.card:hover{transform:translateY(-4px);border-color:rgba(209,160,99,.6)}
+.radio{accent-color:#d1a063;width:18px;height:18px;margin:0}
+</style>
+</helmet>
+
+<div style="width:100%;background:#0e171b;overflow:hidden">
+
+  <!-- NAV -->
+  <header style="background:#16232a;border-bottom:1px solid rgba(232,237,244,.12)">
+    <div style="box-sizing:border-box;max-width:1440px;margin:0 auto;padding:18px 80px;display:flex;flex-wrap:wrap;align-items:center;gap:16px 36px">
+      <a href="Main.dc.html" style="display:flex;align-items:center;gap:14px">
+        <span aria-hidden="true" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(145deg,#e0ad6b,#a8743f);display:flex;align-items:center;justify-content:center">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#1b1610" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 11a1 1 0 0 1-1 .9H7.2a1 1 0 0 1-1-.9z"/><path d="M9 8V7a3 3 0 0 1 6 0v1"/></svg>
+        </span>
+        <span style="font-size:24px;font-weight:500;letter-spacing:.04em;color:#f1f4f8">ShopEasy</span>
+      </a>
+      <nav aria-label="Main" style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 32px;font-size:18px;letter-spacing:.03em">
+        <a class="nav-link" href="Main.dc.html" style="min-height:44px;display:flex;align-items:center">Home</a>
+        <a class="nav-link" href="Products.dc.html" style="min-height:44px;display:flex;align-items:center;color:{{accent}};opacity:1">Products</a>
+        <a class="nav-link" href="Categories.dc.html" style="min-height:44px;display:flex;align-items:center">Categories</a>
+      </nav>
+      <form role="search" style="flex:1 1 260px;min-width:0;max-width:640px">
+        <label for="q" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search products</label>
+        <div style="display:flex;align-items:center;gap:12px;height:48px;box-sizing:border-box;padding:0 16px;border:1px solid rgba(232,237,244,.3);background:rgba(255,255,255,.04)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(232,237,244,.8)" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+          <input id="q" type="search" placeholder="Search products..." style="flex:1;min-width:0;background:transparent;border:0;outline:0;color:#e8edf4;font:inherit;font-size:17px">
+        </div>
+      </form>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px 20px;font-size:18px;letter-spacing:.03em">
+        <a class="nav-link" href="Login.dc.html" style="min-height:44px;display:flex;align-items:center">Login</a>
+        <a href="SignUp.dc.html" style="min-height:44px;box-sizing:border-box;padding:0 20px;display:flex;align-items:center;border:1px solid rgba(232,237,244,.55)">Sign up</a>
+        <a class="nav-link" href="Cart.dc.html" aria-label="Cart, 1 item" style="position:relative;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.2a1.5 1.5 0 0 0 1.5-1.1L20 8H6.2"/><circle cx="9.5" cy="19.5" r="1.2"/><circle cx="17" cy="19.5" r="1.2"/></svg>
+          <span style="position:absolute;top:2px;right:0;min-width:20px;height:20px;box-sizing:border-box;padding:0 5px;border-radius:10px;background:#d1a063;color:#1d1710;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center">1</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- PAGE HEADER -->
+  <section style="background:radial-gradient(ellipse 50% 120% at 15% 0%, rgba(196,160,118,.22), rgba(196,160,118,0) 70%), linear-gradient(180deg,#2a373e 0%,#18242a 55%,#0e171b 100%);padding:72px 80px 64px;box-sizing:border-box">
+    <div style="max-width:1280px;margin:0 auto">
+      <h1 style="margin:0;font-weight:300;font-size:clamp(48px,6vw,84px);line-height:1.05;color:#f1f4f8">Products</h1>
+      <form role="search" style="margin-top:32px;max-width:520px">
+        <label for="pq" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search products</label>
+        <div style="display:flex;align-items:center;gap:12px;height:54px;box-sizing:border-box;padding:0 18px;border:1px solid rgba(232,237,244,.38);background:rgba(14,23,27,.55)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(232,237,244,.8)" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+          <input id="pq" type="search" placeholder="Search products..." style="flex:1;min-width:0;background:transparent;border:0;outline:0;color:#e8edf4;font:inherit;font-size:18px">
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- CATALOG -->
+  <main style="padding:24px 80px 120px;box-sizing:border-box">
+    <div style="max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-start;gap:40px">
+
+      <!-- Filters -->
+      <aside aria-label="Filters" style="flex:0 0 260px;box-sizing:border-box;max-width:100%;padding:32px 28px;background:#16232a;border:1px solid rgba(232,237,244,.12)">
+        <h2 style="margin:0 0 28px;font-size:24px;font-weight:500;color:#f1f4f8">Filters</h2>
+        <fieldset style="margin:0;padding:0;border:0">
+          <legend style="padding:0;margin-bottom:12px;font-size:17px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:{{accent}}">Category</legend>
+          <div style="display:flex;flex-direction:column">
+            <label style="min-height:44px;display:flex;align-items:center;gap:14px;font-size:18px;cursor:pointer"><input class="radio" type="radio" name="cat" checked>All</label>
+            <label style="min-height:44px;display:flex;align-items:center;gap:14px;font-size:18px;cursor:pointer"><input class="radio" type="radio" name="cat">Electronics</label>
+            <label style="min-height:44px;display:flex;align-items:center;gap:14px;font-size:18px;cursor:pointer"><input class="radio" type="radio" name="cat">Home &amp; Kitchen</label>
+            <label style="min-height:44px;display:flex;align-items:center;gap:14px;font-size:18px;cursor:pointer"><input class="radio" type="radio" name="cat">Furniture</label>
+            <label style="min-height:44px;display:flex;align-items:center;gap:14px;font-size:18px;cursor:pointer"><input class="radio" type="radio" name="cat">Clothing</label>
+            <label style="min-height:44px;display:flex;align-items:center;gap:14px;font-size:18px;cursor:pointer"><input class="radio" type="radio" name="cat">Sports</label>
+          </div>
+        </fieldset>
+        <div style="margin-top:32px;display:flex;flex-direction:column;gap:12px">
+          <label for="sort" style="font-size:17px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:{{accent}}">Sort by</label>
+          <select class="field" id="sort" style="height:50px;box-sizing:border-box;padding:0 14px;background:#0e171b;border:1px solid rgba(232,237,244,.38);color:#f1f4f8;font:inherit;font-size:18px">
+            <option>Name (A-Z)</option>
+            <option>Name (Z-A)</option>
+            <option>Price (low to high)</option>
+            <option>Price (high to low)</option>
+          </select>
+        </div>
+      </aside>
+
+      <!-- Grid -->
+      <section aria-label="Product list" style="flex:1 1 640px;min-width:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px">
+          <p style="margin:0;font-size:18px;color:rgba(232,237,244,.85)">Showing 8 products</p>
+          <div style="display:flex;gap:8px">
+            <button type="button" aria-label="Grid view" aria-pressed="true" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:{{accent}};border:0;color:#1d1710;cursor:pointer">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5"/><rect x="13.5" y="4" width="6.5" height="6.5"/><rect x="4" y="13.5" width="6.5" height="6.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5"/></svg>
+            </button>
+            <button type="button" aria-label="List view" aria-pressed="false" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid rgba(232,237,244,.38);color:#e8edf4;cursor:pointer">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:24px">
+          <sc-for list="{{products}}" as="p" hint-placeholder-count="8">
+            <article class="card" style="display:flex;flex-direction:column;background:#16232a;border:1px solid rgba(232,237,244,.12)">
+              <div aria-hidden="true" style="aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#243139 0%,#1a262c 100%);color:rgba(232,237,244,.35)">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="1.5"/><circle cx="9" cy="10" r="1.8"/><path d="M3.5 17.5l5-4.5 3.5 3 3-2.5 5.5 4.5"/></svg>
+              </div>
+              <div style="padding:20px 20px 24px;display:flex;flex-direction:column;gap:10px;flex:1">
+                <h3 style="margin:0;font-size:20px;font-weight:500;line-height:1.25;color:#f1f4f8"><a href="ProductDetail.dc.html">{{p.name}}</a></h3>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="display:flex;gap:2px" aria-label="Rated 4 out of 5">
+                    <sc-for list="{{p.stars}}" as="s" hint-placeholder-count="5">
+                      <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="{{s.fill}}" stroke="{{s.stroke}}" stroke-width="1.5" stroke-linejoin="round"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.1 6.3 20.3l1.2-6.4L2.8 9.5l6.4-.8z"/></svg>
+                    </sc-for>
+                  </div>
+                  <span style="font-size:15px;color:rgba(232,237,244,.78)">({{p.reviews}})</span>
+                </div>
+                <div style="font-size:28px;font-weight:600;color:{{accent}}">{{p.price}}</div>
+                <p style="margin:0;font-size:16px;line-height:1.5;color:rgba(232,237,244,.78)">{{p.blurb}}</p>
+              </div>
+            </article>
+          </sc-for>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer style="background:#0a1114;padding:72px 80px 40px;box-sizing:border-box">
+    <div style="max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:48px 40px">
+      <div>
+        <div style="font-size:28px;font-weight:500;letter-spacing:.04em;color:#f1f4f8">ShopEasy</div>
+        <p style="margin:18px 0 24px;font-size:18px;line-height:1.55;color:rgba(232,237,244,.8);max-width:320px">Your one-stop destination for quality products at great prices. We're committed to providing the best shopping experience.</p>
+        <div style="display:flex;gap:8px">
+          <a class="foot-link" href="#facebook" aria-label="Facebook" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 8.5h2.2V5H14c-2.2 0-3.6 1.4-3.6 3.6V11H8v3.4h2.4V20h3.4v-5.6h2.3l.5-3.4h-2.8V9c0-.3.1-.5.2-.5z"/></svg></a>
+          <a class="foot-link" href="#twitter" aria-label="Twitter" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 5l6.4 8.4L4.8 19.5M19.5 5l-6 6.4M8 5H5l11.6 14H20z"/></svg></a>
+          <a class="foot-link" href="#instagram" aria-label="Instagram" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.8" cy="7.2" r=".6" fill="currentColor"/></svg></a>
+        </div>
+      </div>
+      <div>
+        <h2 style="margin:0 0 18px;font-size:22px;font-weight:500;color:#f1f4f8">Quick Links</h2>
+        <nav aria-label="Quick links" style="display:flex;flex-direction:column;gap:2px;font-size:18px">
+          <a class="foot-link" href="Main.dc.html" style="min-height:40px;display:flex;align-items:center">Home</a>
+          <a class="foot-link" href="Products.dc.html" style="min-height:40px;display:flex;align-items:center">Products</a>
+          <a class="foot-link" href="Cart.dc.html" style="min-height:40px;display:flex;align-items:center">Shopping Cart</a>
+          <a class="foot-link" href="About.dc.html" style="min-height:40px;display:flex;align-items:center">About Us</a>
+        </nav>
+      </div>
+      <div>
+        <h2 style="margin:0 0 18px;font-size:22px;font-weight:500;color:#f1f4f8">Customer Service</h2>
+        <nav aria-label="Customer service" style="display:flex;flex-direction:column;gap:2px;font-size:18px">
+          <a class="foot-link" href="Contact.dc.html" style="min-height:40px;display:flex;align-items:center">Contact Us</a>
+          <a class="foot-link" href="Shipping.dc.html" style="min-height:40px;display:flex;align-items:center">Shipping Info</a>
+          <a class="foot-link" href="Returns.dc.html" style="min-height:40px;display:flex;align-items:center">Returns</a>
+          <a class="foot-link" href="FAQ.dc.html" style="min-height:40px;display:flex;align-items:center">FAQ</a>
+        </nav>
+      </div>
+      <div>
+        <h2 style="margin:0 0 18px;font-size:22px;font-weight:500;color:#f1f4f8">Contact Info</h2>
+        <div style="display:flex;flex-direction:column;gap:18px;font-size:18px;line-height:1.45;color:rgba(232,237,244,.85)">
+          <div style="display:flex;gap:14px;align-items:flex-start"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:3px"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg><span>123 5KM Stone Road Rajnagar Extension Ghaziabad</span></div>
+          <div style="display:flex;gap:14px;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1.5 1.5 0 0 1-1.6 1.5C10.6 20 4 13.4 3.5 5.6A1.5 1.5 0 0 1 5 4z"/></svg><span>+1 (555) 123-4567</span></div>
+          <div style="display:flex;gap:14px;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7l8.5 6 8.5-6"/></svg><span>info@shopeasy.com</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="max-width:1280px;margin:56px auto 0;padding-top:24px;border-top:1px solid rgba(232,237,244,.14);font-size:16px;color:rgba(232,237,244,.7)">&copy; 2026 ShopEasy. All rights reserved.</div>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#d1a063","options":["#d1a063","#e0b36a","#c98a5a","#9fc2b6"]},"$preview":{"width":1440,"height":1840}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const accent = this.props.accent ?? '#d1a063';
+    const stars = () => [1,2,3,4,5].map((n) => n <= 4
+      ? { fill: accent, stroke: accent }
+      : { fill: 'none', stroke: 'rgba(232,237,244,.5)' });
+    const items = [
+      { name: 'Ergonomic Office Chair', reviews: 45, price: '$299.99', blurb: 'Comfortable ergonomic chair with lumbar support and…' },
+      { name: 'Organic Cotton T-Shirt', reviews: 156, price: '$24.99', blurb: 'Soft, sustainable organic cotton t-shirt in various…' },
+      { name: 'Premium Coffee Maker', reviews: 67, price: '$149.99', blurb: 'Programmable coffee maker with built-in grinder and…' },
+      { name: 'Smart Fitness Watch', reviews: 89, price: '$199.99', blurb: 'Advanced fitness tracking with heart rate monitoring…' },
+      { name: 'Stainless Steel Water Bottle', reviews: 203, price: '$19.99', blurb: 'Insulated stainless steel bottle that keeps drinks col…' },
+      { name: 'Wireless Bluetooth Headphones', reviews: 128, price: '$99.99', blurb: 'High-quality wireless headphones with noise…' },
+      { name: 'Wireless Gaming Mouse', reviews: 92, price: '$79.99', blurb: 'High-precision gaming mouse with customizable…' },
+      { name: 'Yoga Mat Premium', reviews: 78, price: '$49.99', blurb: 'Non-slip yoga mat with excellent grip and…' }
+    ];
+    return { accent, products: items.map((p) => ({ ...p, stars: stars() })) };
+  }
+}
+</script>
+</body>
+</html>

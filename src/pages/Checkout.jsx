@@ -4,8 +4,7 @@ import { CreditCard, Lock, ArrowLeft } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { PageHeader } from '../components/DesignSystem'
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
+import { apiRequest } from '../services/api'
 
 const Checkout = () => {
   const navigate = useNavigate()
@@ -39,13 +38,10 @@ const Checkout = () => {
     setIsProcessing(true)
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/orders`, {
+      const data = await apiRequest('/api/orders', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
+        token,
+        body: {
           items,
           shippingAddress: {
             firstName: formData.firstName,
@@ -59,17 +55,11 @@ const Checkout = () => {
           },
           total: total,
           paymentMethod: 'Card',
-        }),
+        },
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Unable to place order')
-      }
-
       clearCart()
-      navigate(`/track-order?id=${data.order._id}`)
+      navigate(`/order-confirmation?id=${data.order._id}`)
     } catch (error) {
       alert(error.message || 'Something went wrong while placing your order.')
     } finally {

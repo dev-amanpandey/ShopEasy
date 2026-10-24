@@ -1,15 +1,20 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { apiRequest } from '../services/api'
 
 const AuthContext = createContext(null)
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
+const readStoredUser = () => {
+  if (typeof window === 'undefined') return null
+  try {
+    return JSON.parse(window.localStorage.getItem('auth_user') || 'null')
+  } catch {
+    return null
+  }
+}
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    if (typeof window === 'undefined') return null
-    const storedUser = window.localStorage.getItem('auth_user')
-    return storedUser ? JSON.parse(storedUser) : null
+    return readStoredUser()
   })
   const [token, setToken] = useState(() => {
     if (typeof window === 'undefined') return null
@@ -36,6 +41,16 @@ export const AuthProvider = ({ children }) => {
   }, [token])
 
   useEffect(() => {
+    const clearExpiredSession = () => {
+      setUser(null)
+      setToken(null)
+    }
+
+    window.addEventListener('shopeasy:unauthorized', clearExpiredSession)
+    return () => window.removeEventListener('shopeasy:unauthorized', clearExpiredSession)
+  }, [])
+
+  useEffect(() => {
     const initializeAuth = async () => {
       if (!token) {
         setIsAuthLoading(false)
@@ -43,22 +58,16 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
+        const data = await apiRequest('/api/auth/me', { token })
 
-        const data = await res.json()
-
-        if (!res.ok || !data.user) {
-          throw new Error(data.message || 'Session expired')
-        }
+        if (!data?.user) throw new Error('Could not restore your session')
 
         setUser(data.user)
-      } catch {
-        setUser(null)
-        setToken(null)
+      } catch (error) {
+        if (error.status === 401) {
+          setUser(null)
+          setToken(null)
+        }
       } finally {
         setIsAuthLoading(false)
       }
@@ -68,16 +77,10 @@ export const AuthProvider = ({ children }) => {
   }, [token])
 
   const signup = async ({ name, email, password }) => {
-    const res = await fetch(`${API_BASE_URL}/api/auth/signup`, {
+    const data = await apiRequest('/api/auth/signup', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password }),
+      body: { name, email, password },
     })
-
-    const data = await res.json()
-    if (!res.ok) {
-      throw new Error(data.message || 'Signup failed')
-    }
 
     setUser(data.user)
     setToken(data.token)
@@ -85,16 +88,10 @@ export const AuthProvider = ({ children }) => {
   }
 
   const login = async ({ email, password }) => {
-    const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+    const data = await apiRequest('/api/auth/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: { email, password },
     })
-
-    const data = await res.json()
-    if (!res.ok) {
-      throw new Error(data.message || 'Login failed')
-    }
 
     setUser(data.user)
     setToken(data.token)
@@ -112,20 +109,11 @@ export const AuthProvider = ({ children }) => {
       payload.password = password
     }
 
-    const res = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+    const data = await apiRequest('/api/auth/profile', {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(payload),
+      token,
+      body: payload,
     })
-
-    const data = await res.json()
-
-    if (!res.ok) {
-      throw new Error(data.message || 'Profile update failed')
-    }
 
     setUser(data.user)
     return data.user

@@ -33,7 +33,14 @@ function App() {
               <Route path="/returns" element={<PolicyPage type="Returns" />} />
               <Route path="/faq" element={<FAQPage />} />
               <Route path="/about" element={<AboutPage />} />
-              <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
+              <Route
+                path="/order-confirmation"
+                element={
+                  <ProtectedRoute>
+                    <OrderConfirmationPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/cart" element={<Cart />} />
               <Route
                 path="/checkout"

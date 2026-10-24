@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { PackageCheck, Truck, MapPin, Search } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { apiRequest } from '../services/api'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
 const statusSteps = ['Processing', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered']
 
 const OrderTracking = () => {
@@ -34,17 +34,7 @@ const OrderTracking = () => {
     setError('')
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/orders/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Unable to find order')
-      }
+      const data = await apiRequest(`/api/orders/${encodeURIComponent(id)}`, { token })
 
       setOrder(data.order)
     } catch (err) {

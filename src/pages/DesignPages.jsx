@@ -1,7 +1,9 @@
-import { Link } from 'react-router-dom'
-import { Truck, ShieldCheck, Headphones, MapPin, Phone, Mail, PackageCheck, RotateCcw, Globe2 } from 'lucide-react'
-import { products } from '../data/products'
+import { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { Truck, ShieldCheck, Headphones, MapPin, Phone, Mail, PackageCheck, RotateCcw, Globe2, CheckCircle2 } from 'lucide-react'
 import { Input, PageHeader } from '../components/DesignSystem'
+import { useAuth } from '../context/AuthContext'
+import { apiRequest } from '../services/api'
 
 const Content = ({ children, className = '' }) => <div className={`shopeasy-main ${className}`}>{children}</div>
 
@@ -39,9 +41,51 @@ export const FAQPage = () => <><PageHeader title="FAQ" description="Quick answer
 
 export const AboutPage = () => <><PageHeader title="About Us" description="Quality products, fair prices and service we stand behind." /><Content><p className="about-lead">Your one-stop destination for quality products at great prices. We're committed to providing the best shopping experience.</p><div className="about-values"><article><Truck /><h2>Fast shipping</h2><p>Orders leave quickly and arrive when you expect them.</p></article><article><ShieldCheck /><h2>Secure payments</h2><p>Check out with confidence. Your details stay protected.</p></article><article><Headphones /><h2>Customer care</h2><p>Real people ready to help, because your satisfaction is our priority.</p></article></div><article className="story-card"><h2>Our story</h2><p className="accent-copy">[YOUR STORY: who you are, why you started ShopEasy]</p></article><div className="about-cta"><Link to="/products" className="shopeasy-button">Shop now</Link><span>Rated 4.8/5 based on 10,000+ reviews</span></div></Content></>
 
-export const ContactPage = () => <><PageHeader title="Contact Us" description="Questions about an order or a product? Reach us any way you like." /><Content><div className="contact-layout"><section className="contact-details" aria-label="Contact details">{[[MapPin, 'Visit us', '123 5KM Stone Road Rajnagar Extension Ghaziabad'], [Phone, 'Call us', '+1 (555) 123-4567'], [Mail, 'Email us', 'info@shopeasy.com']].map(([Icon, label, value]) => <article key={label}><Icon /><div><span>{label}</span><p>{value}</p></div></article>)}</section><section className="contact-form-card"><h2>Send us a message</h2><form onSubmit={(event) => event.preventDefault()}><Input label="Name" id="contact-name" required /><Input label="Email" id="contact-email" type="email" required /><label htmlFor="contact-message">Message</label><textarea id="contact-message" rows="5" required /><button className="shopeasy-button" type="submit">Send message</button></form></section></div></Content></>
+export const ContactPage = () => {
+  const [message, setMessage] = useState('')
+  return <><PageHeader title="Contact Us" description="Questions about an order or a product? Reach us any way you like." /><Content><div className="contact-layout"><section className="contact-details" aria-label="Contact details">{[[MapPin, 'Visit us', '123 5KM Stone Road Rajnagar Extension Ghaziabad'], [Phone, 'Call us', '+1 (555) 123-4567'], [Mail, 'Email us', 'info@shopeasy.com']].map(([Icon, label, value]) => <article key={label}><Icon /><div><span>{label}</span><p>{value}</p></div></article>)}</section><section className="contact-form-card"><h2>Send us a message</h2><form onSubmit={(event) => { event.preventDefault(); setMessage('This form is not connected yet. Please email info@shopeasy.com.') }}><Input label="Name" id="contact-name" required /><Input label="Email" id="contact-email" type="email" required /><label htmlFor="contact-message">Message</label><textarea id="contact-message" rows="5" required /><button className="shopeasy-button" type="submit">Send message</button>{message && <p role="status" className="accent-copy">{message}</p>}</form></section></div></Content></>
+}
 
 export const OrderConfirmationPage = () => {
-  const shownProducts = [products[5], products[0]]
-  return <><section className="shopeasy-page-header"><div className="confirmation-header"><span className="confirmation-icon"><CheckCircle2 /></span><h1>Thank you for your order</h1><p>We've received your order and it is on its way to being packed.</p></div></section><Content className="confirmation-page"><div className="confirmation-grid"><section className="confirmation-card"><h2>Order details</h2><dl>{[['Order number', '[ORDER NUMBER]'], ['Estimated delivery', '[ESTIMATED DELIVERY DATE]'], ['Shipping to', '[SHIPPING ADDRESS FROM CHECKOUT]'], ['Payment', 'Card ending in [LAST 4 DIGITS]'], ['Confirmation sent to', '[EMAIL FROM CHECKOUT]']].map(([key, value]) => <div key={key}><dt>{key}</dt><dd>{value}</dd></div>)}</dl></section><aside className="confirmation-card"><h2>Order Summary</h2><ul className="confirmation-items">{shownProducts.map((item, index) => <li key={item.id}><img src={item.image} alt={item.name} /><div><strong>{item.name}</strong><span>Qty: 1</span></div><b>${(index === 0 ? 19.99 : 99.99).toFixed(2)}</b></li>)}</ul><div className="confirmation-total"><span>Total</span><strong>$129.58</strong></div></aside></div><div className="confirmation-actions"><Link className="shopeasy-button" to="/products">Continue Shopping</Link><Link className="shopeasy-button-outline" to="/profile">View My Orders</Link></div></Content></>
+  const location = useLocation()
+  const { token } = useAuth()
+  const orderId = new URLSearchParams(location.search).get('id')
+  const [order, setOrder] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    let isActive = true
+    const loadOrder = async () => {
+      if (!orderId) {
+        setError('Order details are unavailable because no order ID was provided.')
+        setIsLoading(false)
+        return
+      }
+      if (!token) {
+        setError('Sign in to view this order confirmation.')
+        setIsLoading(false)
+        return
+      }
+      setIsLoading(true)
+      setError('')
+      try {
+        const data = await apiRequest(`/api/orders/${encodeURIComponent(orderId)}`, { token })
+        if (isActive) setOrder(data.order)
+      } catch (requestError) {
+        if (isActive) setError(requestError.message || 'Could not load this order.')
+      } finally {
+        if (isActive) setIsLoading(false)
+      }
+    }
+    loadOrder()
+    return () => { isActive = false }
+  }, [orderId, token])
+
+  const shipping = order?.shippingAddress
+  const shippingAddress = shipping
+    ? `${shipping.firstName} ${shipping.lastName}, ${shipping.address}, ${shipping.city}, ${shipping.state} ${shipping.zipCode}`
+    : '[SHIPPING ADDRESS FROM CHECKOUT]'
+
+  return <><section className="shopeasy-page-header"><div className="confirmation-header"><span className="confirmation-icon"><CheckCircle2 /></span><h1>Thank you for your order</h1><p>We've received your order and it is on its way to being packed.</p></div></section><Content className="confirmation-page">{isLoading && <p role="status">Loading your order…</p>}{error && <p className="accent-copy" role="alert">{error}</p>}{order && <><div className="confirmation-grid"><section className="confirmation-card"><h2>Order details</h2><dl>{[['Order number', order._id], ['Estimated delivery', '[ESTIMATED DELIVERY DATE]'], ['Shipping to', shippingAddress], ['Payment', order.paymentMethod || 'Card'], ['Confirmation sent to', shipping?.email || '[EMAIL FROM CHECKOUT]']].map(([key, value]) => <div key={key}><dt>{key}</dt><dd>{value}</dd></div>)}</dl></section><aside className="confirmation-card"><h2>Order Summary</h2><ul className="confirmation-items">{order.items.map((item) => <li key={item.id}><img src={item.image} alt={item.name} /><div><strong>{item.name}</strong><span>Qty: {item.quantity}</span></div><b>${(item.price * item.quantity).toFixed(2)}</b></li>)}</ul><div className="confirmation-total"><span>Total</span><strong>${Number(order.total).toFixed(2)}</strong></div></aside></div><div className="confirmation-actions"><Link className="shopeasy-button" to="/products">Continue Shopping</Link><Link className="shopeasy-button-outline" to="/profile">View My Orders</Link></div></>}</Content></>
 }

@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ShopEasy Shipping Info</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0e171b;font-family:'Josefin Sans',system-ui,sans-serif;color:#e8edf4}
+a{text-decoration:none;color:inherit}
+.nav-link{opacity:.88;transition:opacity .2s}
+.nav-link:hover{opacity:1}
+.btn-primary{transition:filter .2s, transform .2s}
+.btn-primary:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.field{height:52px;box-sizing:border-box;width:100%;padding:0 16px;background:rgba(255,255,255,.06);border:1px solid rgba(232,237,244,.38);color:#f1f4f8;font:inherit;font-size:18px}
+.field::placeholder{color:rgba(232,237,244,.55)}
+.field:focus{outline:2px solid #d1a063;outline-offset:2px;border-color:#d1a063}
+.lbl{font-size:17px;font-weight:500;letter-spacing:.03em}
+.foot-link{opacity:.8;transition:opacity .2s}
+.foot-link:hover{opacity:1}
+.back:hover{text-decoration:underline}
+a:focus-visible,button:focus-visible{outline:2px solid #d1a063;outline-offset:2px}
+</style>
+</helmet>
+
+<div style="width:100%;background:#0e171b;overflow:hidden">
+
+  <!-- NAV (signed in) -->
+  <header style="background:#16232a;border-bottom:1px solid rgba(232,237,244,.12)">
+    <div style="box-sizing:border-box;max-width:1440px;margin:0 auto;padding:18px 80px;display:flex;flex-wrap:wrap;align-items:center;gap:16px 36px">
+      <a href="Main.dc.html" style="display:flex;align-items:center;gap:14px">
+        <span aria-hidden="true" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(145deg,#e0ad6b,#a8743f);display:flex;align-items:center;justify-content:center">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#1b1610" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 11a1 1 0 0 1-1 .9H7.2a1 1 0 0 1-1-.9z"/><path d="M9 8V7a3 3 0 0 1 6 0v1"/></svg>
+        </span>
+        <span style="font-size:24px;font-weight:500;letter-spacing:.04em;color:#f1f4f8">ShopEasy</span>
+      </a>
+      <nav aria-label="Main" style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 32px;font-size:18px;letter-spacing:.03em">
+        <a class="nav-link" href="Main.dc.html" style="min-height:44px;display:flex;align-items:center">Home</a>
+        <a class="nav-link" href="Products.dc.html" style="min-height:44px;display:flex;align-items:center">Products</a>
+        <a class="nav-link" href="Categories.dc.html" style="min-height:44px;display:flex;align-items:center">Categories</a>
+      </nav>
+      <form role="search" style="flex:1 1 260px;min-width:0;max-width:640px">
+        <label for="q" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search products</label>
+        <div style="display:flex;align-items:center;gap:12px;height:48px;box-sizing:border-box;padding:0 16px;border:1px solid rgba(232,237,244,.3);background:rgba(255,255,255,.04)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(232,237,244,.8)" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+          <input id="q" type="search" placeholder="Search products..." style="flex:1;min-width:0;background:transparent;border:0;outline:0;color:#e8edf4;font:inherit;font-size:17px">
+        </div>
+      </form>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px 20px;font-size:18px;letter-spacing:.03em">
+        <a class="nav-link" href="Dashboard.dc.html" style="min-height:44px;display:flex;align-items:center;gap:10px">
+          <span aria-hidden="true" style="width:34px;height:34px;border-radius:50%;background:{{accent}};color:#1d1710;font-weight:600;display:flex;align-items:center;justify-content:center">A</span>
+          My profile
+        </a>
+        <a class="nav-link" href="Login.dc.html" style="min-height:44px;display:flex;align-items:center">Logout</a>
+        <a class="nav-link" href="Cart.dc.html" aria-label="Cart, 2 items" style="position:relative;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.2a1.5 1.5 0 0 0 1.5-1.1L20 8H6.2"/><circle cx="9.5" cy="19.5" r="1.2"/><circle cx="17" cy="19.5" r="1.2"/></svg>
+          <span style="position:absolute;top:2px;right:0;min-width:20px;height:20px;box-sizing:border-box;padding:0 5px;border-radius:10px;background:{{accent}};color:#1d1710;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;outline:2px solid #16232a">2</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+<!-- PAGE HEADER -->
+  <section style="background:radial-gradient(ellipse 50% 120% at 15% 0%, rgba(196,160,118,.22), rgba(196,160,118,0) 70%), linear-gradient(180deg,#2a373e 0%,#18242a 55%,#0e171b 100%);padding:72px 80px 60px;box-sizing:border-box">
+    <div style="max-width:1280px;margin:0 auto"><h1 style="margin:0;font-weight:300;font-size:clamp(44px,5.6vw,76px);line-height:1.05;color:#f1f4f8;text-wrap:balance">Shipping Info</h1><p style="margin:20px 0 0;max-width:640px;font-size:clamp(18px,2vw,22px);line-height:1.5;letter-spacing:.02em;color:rgba(232,237,244,.9);text-wrap:pretty">What shipping costs and when your order arrives.</p></div>
+  </section>
+
+  <main style="padding:24px 80px 120px;box-sizing:border-box">
+    <div style="max-width:1280px;margin:0 auto">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:28px"><div style="padding:32px;background:#16232a;border:1px solid rgba(232,237,244,.12);display:flex;flex-direction:column;gap:14px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M2 6.5h11v9H2zM13 9.5h4.2L21 13v2.5h-8"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg><h2 style="margin:6px 0 0;font-size:26px;font-weight:500;color:#f1f4f8">Free shipping</h2><p style="margin:0;font-size:19px;line-height:1.55;color:rgba(232,237,244,.88)">Orders over $50 ship free.</p></div><div style="padding:32px;background:#16232a;border:1px solid rgba(232,237,244,.12);display:flex;flex-direction:column;gap:14px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M2 6.5h11v9H2zM13 9.5h4.2L21 13v2.5h-8"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg><h2 style="margin:6px 0 0;font-size:26px;font-weight:500;color:#f1f4f8">Orders under $50</h2><p style="margin:0;font-size:19px;line-height:1.55;color:rgba(232,237,244,.88)">A shipping fee applies and is shown at checkout before you pay.</p></div><div style="padding:32px;background:#16232a;border:1px solid rgba(232,237,244,.12);display:flex;flex-direction:column;gap:14px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M2 6.5h11v9H2zM13 9.5h4.2L21 13v2.5h-8"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg><h2 style="margin:6px 0 0;font-size:26px;font-weight:500;color:#f1f4f8">Delivery times</h2><p style="margin:0;font-size:19px;line-height:1.55;color:rgba(232,237,244,.88)"><span style="color:{{accent}}">[DELIVERY TIME ESTIMATES]</span></p></div><div style="padding:32px;background:#16232a;border:1px solid rgba(232,237,244,.12);display:flex;flex-direction:column;gap:14px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg><h2 style="margin:6px 0 0;font-size:26px;font-weight:500;color:#f1f4f8">Where we deliver</h2><p style="margin:0;font-size:19px;line-height:1.55;color:rgba(232,237,244,.88)"><span style="color:{{accent}}">[DELIVERY AREAS]</span></p></div></div><div style="margin-top:40px;display:flex;flex-wrap:wrap;align-items:center;gap:16px 24px;font-size:20px;color:rgba(232,237,244,.9)">Need help with a delivery? <a class="btn-primary" href="Contact.dc.html" style="min-height:58px;box-sizing:border-box;padding:0 40px;display:inline-flex;align-items:center;justify-content:center;font-size:20px;letter-spacing:.05em;background:{{accent}};color:#1d1710;font-weight:600">Contact Us</a></div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer style="background:#0a1114;padding:72px 80px 40px;box-sizing:border-box">
+    <div style="max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:48px 40px">
+      <div>
+        <div style="font-size:28px;font-weight:500;letter-spacing:.04em;color:#f1f4f8">ShopEasy</div>
+        <p style="margin:18px 0 24px;font-size:18px;line-height:1.55;color:rgba(232,237,244,.8);max-width:320px">Your one-stop destination for quality products at great prices. We're committed to providing the best shopping experience.</p>
+        <div style="display:flex;gap:8px">
+          <a class="foot-link" href="#facebook" aria-label="Facebook" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 8.5h2.2V5H14c-2.2 0-3.6 1.4-3.6 3.6V11H8v3.4h2.4V20h3.4v-5.6h2.3l.5-3.4h-2.8V9c0-.3.1-.5.2-.5z"/></svg></a>
+          <a class="foot-link" href="#twitter" aria-label="Twitter" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 5l6.4 8.4L4.8 19.5M19.5 5l-6 6.4M8 5H5l11.6 14H20z"/></svg></a>
+          <a class="foot-link" href="#instagram" aria-label="Instagram" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.8" cy="7.2" r=".6" fill="currentColor"/></svg></a>
+        </div>
+      </div>
+      <div>
+        <h2 style="margin:0 0 18px;font-size:22px;font-weight:500;color:#f1f4f8">Quick Links</h2>
+        <nav aria-label="Quick links" style="display:flex;flex-direction:column;gap:2px;font-size:18px">
+          <a class="foot-link" href="Main.dc.html" style="min-height:40px;display:flex;align-items:center">Home</a>
+          <a class="foot-link" href="Products.dc.html" style="min-height:40px;display:flex;align-items:center">Products</a>
+          <a class="foot-link" href="Cart.dc.html" style="min-height:40px;display:flex;align-items:center">Shopping Cart</a>
+          <a class="foot-link" href="About.dc.html" style="min-height:40px;display:flex;align-items:center">About Us</a>
+        </nav>
+      </div>
+      <div>
+        <h2 style="margin:0 0 18px;font-size:22px;font-weight:500;color:#f1f4f8">Customer Service</h2>
+        <nav aria-label="Customer service" style="display:flex;flex-direction:column;gap:2px;font-size:18px">
+          <a class="foot-link" href="Contact.dc.html" style="min-height:40px;display:flex;align-items:center">Contact Us</a>
+          <a class="foot-link" href="Shipping.dc.html" style="min-height:40px;display:flex;align-items:center">Shipping Info</a>
+          <a class="foot-link" href="Returns.dc.html" style="min-height:40px;display:flex;align-items:center">Returns</a>
+          <a class="foot-link" href="FAQ.dc.html" style="min-height:40px;display:flex;align-items:center">FAQ</a>
+        </nav>
+      </div>
+      <div>
+        <h2 style="margin:0 0 18px;font-size:22px;font-weight:500;color:#f1f4f8">Contact Info</h2>
+        <div style="display:flex;flex-direction:column;gap:18px;font-size:18px;line-height:1.45;color:rgba(232,237,244,.85)">
+          <div style="display:flex;gap:14px;align-items:flex-start"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:3px"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg><span>123 5KM Stone Road Rajnagar Extension Ghaziabad</span></div>
+          <div style="display:flex;gap:14px;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1.5 1.5 0 0 1-1.6 1.5C10.6 20 4 13.4 3.5 5.6A1.5 1.5 0 0 1 5 4z"/></svg><span>+1 (555) 123-4567</span></div>
+          <div style="display:flex;gap:14px;align-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7l8.5 6 8.5-6"/></svg><span>info@shopeasy.com</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="max-width:1280px;margin:56px auto 0;padding-top:24px;border-top:1px solid rgba(232,237,244,.14);font-size:16px;color:rgba(232,237,244,.7)">&copy; 2026 ShopEasy. All rights reserved.</div>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#d1a063","options":["#d1a063","#e0b36a","#c98a5a","#9fc2b6"]},"$preview":{"width":1440,"height":1280}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#d1a063' };
+  }
+}
+</script>
+</body>
+</html>
