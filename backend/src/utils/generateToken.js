@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 
 const generateToken = (user) => {
-  const jwtSecret = process.env.JWT_SECRET || 'dev_jwt_secret_change_me';
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) throw new Error('JWT_SECRET is required');
 
   const payload = {
     id: user._id,

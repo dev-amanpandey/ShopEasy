@@ -20,19 +20,19 @@ const writeLocalWishlist = (storageKey, productIds) => {
 }
 
 export const WishlistProvider = ({ children }) => {
-  const { token, user } = useAuth()
+  const { hasSession, user } = useAuth()
   const [productIds, setProductIds] = useState([])
-  const [isLoading, setIsLoading] = useState(Boolean(token))
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [isLocalOnly, setIsLocalOnly] = useState(false)
   const [notice, setNotice] = useState('')
   const requestVersion = useRef(0)
-  const userKey = user?.id || user?._id || user?.email || (token ? 'signed-in-user' : '')
+  const userKey = user?.id || user?._id || user?.email || (hasSession ? 'signed-in-user' : '')
   const storageKey = userKey ? `shopeasy:wishlist:${encodeURIComponent(String(userKey))}` : ''
 
   const loadWishlist = useCallback(async () => {
     const version = ++requestVersion.current
-    if (!token) {
+    if (!hasSession) {
       setProductIds([])
       setError('')
       setNotice('')
@@ -47,7 +47,7 @@ export const WishlistProvider = ({ children }) => {
     setIsLocalOnly(false)
     setIsLoading(true)
     try {
-      const data = await apiRequest('/api/auth/wishlist', { token })
+      const data = await apiRequest('/api/auth/wishlist')
       if (version !== requestVersion.current) return
 
       const serverIds = (data.wishlistProductIds || []).map(String)
@@ -57,7 +57,6 @@ export const WishlistProvider = ({ children }) => {
         try {
           const saved = await apiRequest('/api/auth/wishlist', {
             method: 'PUT',
-            token,
             body: { productIds: mergedIds },
           })
           if (version !== requestVersion.current) return
@@ -85,12 +84,12 @@ export const WishlistProvider = ({ children }) => {
     } finally {
       if (version === requestVersion.current) setIsLoading(false)
     }
-  }, [storageKey, token])
+  }, [storageKey, hasSession])
 
   useEffect(() => { loadWishlist() }, [loadWishlist])
 
   const saveProductIds = useCallback(async (nextIds) => {
-    if (!token) throw new Error('Sign in to save wishlist items.')
+    if (!hasSession) throw new Error('Sign in to save wishlist items.')
     if (isLoading) throw new Error('Your wishlist is still loading. Please try again shortly.')
     if (error) throw new Error('Could not load your saved wishlist. Reload it before making changes.')
     const version = ++requestVersion.current
@@ -103,7 +102,6 @@ export const WishlistProvider = ({ children }) => {
     try {
       const data = await apiRequest('/api/auth/wishlist', {
         method: 'PUT',
-        token,
         body: { productIds: nextIds },
       })
       const savedIds = (data.wishlistProductIds || []).map(String)
@@ -122,7 +120,7 @@ export const WishlistProvider = ({ children }) => {
       if (version === requestVersion.current) setError(requestError.message || 'Could not save your wishlist')
       throw requestError
     }
-  }, [error, isLoading, isLocalOnly, storageKey, token])
+  }, [error, isLoading, isLocalOnly, storageKey, hasSession])
 
   const toggleProduct = useCallback(async (productId) => {
     const id = String(productId)

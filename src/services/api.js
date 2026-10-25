@@ -16,7 +16,8 @@ export const apiRequest = async (path, options = {}) => {
     throw new Error('The backend URL is not configured. Set VITE_API_BASE_URL in the frontend deployment environment and rebuild.')
   }
 
-  const { token, headers: suppliedHeaders, body, ...requestOptions } = options
+  const { headers: suppliedHeaders, body, ...requestOptions } = options
+  delete requestOptions.token
   const headers = new Headers(suppliedHeaders)
   let requestBody = body
 
@@ -25,14 +26,11 @@ export const apiRequest = async (path, options = {}) => {
     requestBody = JSON.stringify(body)
   }
 
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`)
-  }
-
   let response
   try {
     response = await fetch(`${API_BASE_URL}${path}`, {
       ...requestOptions,
+      credentials: 'include',
       headers,
       body: requestBody,
     })

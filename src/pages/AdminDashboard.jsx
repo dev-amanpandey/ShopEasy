@@ -4,14 +4,14 @@ import { apiRequest } from '../services/api'
 import { formatINR } from '../utils/currency'
 
 const AdminDashboard = () => {
-  const { user, token } = useAuth()
+  const { user, hasSession } = useAuth()
   const [orders, setOrders] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
     let isActive = true
-    apiRequest('/api/orders/admin/all', { token })
+    apiRequest('/api/orders/admin/all')
       .then((data) => {
         if (isActive) setOrders(data.orders || [])
       })
@@ -23,7 +23,7 @@ const AdminDashboard = () => {
       })
 
     return () => { isActive = false }
-  }, [token])
+  }, [hasSession])
 
   const totalRevenue = orders.reduce((sum, order) => sum + Number(order.total || 0), 0)
 

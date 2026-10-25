@@ -7,6 +7,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import connectDB from './src/config/db.js';
 import authRoutes from './src/routes/authRoutes.js';
+import googleAuthRoutes from './src/routes/googleAuthRoutes.js';
 import orderRoutes from './src/routes/orderRoutes.js';
 //import { findDOMNode } from 'react-dom';
 
@@ -40,7 +41,7 @@ const isLocalDevelopmentOrigin = (value) => {
 const allowedOrigins = new Set(
   [
     ...(process.env.CLIENT_ORIGIN || '').split(','),
-    'https://e-commerce-lac-beta-32.vercel.app',
+    process.env.FRONTEND_URL || '',
   ]
     .map((origin) => normalizeOrigin(origin.trim()))
     .filter(Boolean)
@@ -67,6 +68,7 @@ app.use(morgan('dev'));
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/auth', googleAuthRoutes);
 app.use('/api/orders', orderRoutes);
 
 app.get('/', (req, res) => {

@@ -49,7 +49,7 @@ export const ContactPage = () => {
 
 export const OrderConfirmationPage = () => {
   const location = useLocation()
-  const { token } = useAuth()
+  const { hasSession } = useAuth()
   const orderId = new URLSearchParams(location.search).get('id')
   const [order, setOrder] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -63,7 +63,7 @@ export const OrderConfirmationPage = () => {
         setIsLoading(false)
         return
       }
-      if (!token) {
+      if (!hasSession) {
         setError('Sign in to view this order confirmation.')
         setIsLoading(false)
         return
@@ -71,7 +71,7 @@ export const OrderConfirmationPage = () => {
       setIsLoading(true)
       setError('')
       try {
-        const data = await apiRequest(`/api/orders/${encodeURIComponent(orderId)}`, { token })
+        const data = await apiRequest(`/api/orders/${encodeURIComponent(orderId)}`)
         if (isActive) setOrder(data.order)
       } catch (requestError) {
         if (isActive) setError(requestError.message || 'Could not load this order.')
@@ -81,7 +81,7 @@ export const OrderConfirmationPage = () => {
     }
     loadOrder()
     return () => { isActive = false }
-  }, [orderId, token])
+  }, [orderId, hasSession])
 
   const shipping = order?.shippingAddress
   const shippingAddress = shipping

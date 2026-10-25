@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { CreditCard, Lock, ArrowLeft } from 'lucide-react'
 import { useCart } from '../context/CartContext'
-import { useAuth } from '../context/AuthContext'
 import { PageHeader } from '../components/DesignSystem'
 import { apiRequest } from '../services/api'
 import { formatINR } from '../utils/currency'
@@ -10,7 +9,6 @@ import { formatINR } from '../utils/currency'
 const Checkout = () => {
   const navigate = useNavigate()
   const { items, getTotalPrice, clearCart } = useCart()
-  const { token } = useAuth()
   const [formData, setFormData] = useState({
     email: '',
     firstName: '',
@@ -41,7 +39,6 @@ const Checkout = () => {
     try {
       const data = await apiRequest('/api/orders', {
         method: 'POST',
-        token,
         body: {
           items,
           shippingAddress: {

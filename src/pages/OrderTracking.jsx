@@ -8,7 +8,7 @@ import { formatINR } from '../utils/currency'
 const statusSteps = ['Processing', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered']
 
 const OrderTracking = () => {
-  const { token } = useAuth()
+  const { hasSession } = useAuth()
   const location = useLocation()
   const [trackingId, setTrackingId] = useState('')
   const [order, setOrder] = useState(null)
@@ -26,7 +26,7 @@ const OrderTracking = () => {
   }, [location.search])
 
   const fetchOrder = async (id) => {
-    if (!id || !token) {
+    if (!id || !hasSession) {
       setError('Please sign in to track your order.')
       return
     }
@@ -35,7 +35,7 @@ const OrderTracking = () => {
     setError('')
 
     try {
-      const data = await apiRequest(`/api/orders/${encodeURIComponent(id)}`, { token })
+      const data = await apiRequest(`/api/orders/${encodeURIComponent(id)}`)
 
       setOrder(data.order)
     } catch (err) {

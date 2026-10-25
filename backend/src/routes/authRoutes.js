@@ -1,9 +1,12 @@
 import express from 'express';
+import { rateLimit } from 'express-rate-limit';
 import User from '../models/User.js';
 import generateToken from '../utils/generateToken.js';
+import { clearSessionCookie, setSessionCookie } from '../utils/authSession.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
+const passwordAuthLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: 'draft-7', legacyHeaders: false });
 
 const formatUser = (user) => ({
   id: user._id,
@@ -11,12 +14,14 @@ const formatUser = (user) => ({
   email: user.email,
   role: user.role,
   avatar: user.avatar || '',
+  provider: user.provider || 'local',
+  emailVerified: Boolean(user.emailVerified),
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
 });
 
 // POST /api/auth/signup
-router.post('/signup', async (req, res) => {
+router.post('/signup', passwordAuthLimiter, async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
@@ -32,10 +37,9 @@ router.post('/signup', async (req, res) => {
 
     const user = await User.create({ name, email, password });
 
-    const token = generateToken(user);
+    setSessionCookie(res, generateToken(user));
 
     res.status(201).json({
-      token,
       user: formatUser(user),
     });
   } catch (error) {
@@ -45,7 +49,7 @@ router.post('/signup', async (req, res) => {
 });
 
 // POST /api/auth/login
-router.post('/login', async (req, res) => {
+router.post('/login', passwordAuthLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -59,16 +63,19 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
+    if (!user.password) {
+      return res.status(400).json({ message: 'This account uses Google sign-in. Continue with Google, or set a password from your account settings.' });
+    }
+
     const isMatch = await user.matchPassword(password);
 
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    const token = generateToken(user);
+    setSessionCookie(res, generateToken(user));
 
     res.json({
-      token,
       user: formatUser(user),
     });
   } catch (error) {
@@ -80,6 +87,11 @@ router.post('/login', async (req, res) => {
 // GET /api/auth/me
 router.get('/me', protect, async (req, res) => {
   res.json({ user: req.user });
+});
+
+router.post('/logout', (req, res) => {
+  clearSessionCookie(res);
+  res.json({ message: 'Logged out' });
 });
 
 router.get('/wishlist', protect, async (req, res) => {

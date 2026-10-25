@@ -10,7 +10,7 @@ import { useWishlist } from '../context/WishlistContext'
 import { products } from '../data/products'
 
 const Profile = () => {
-  const { user, token, updateProfile } = useAuth()
+  const { user, hasSession, updateProfile } = useAuth()
   const { productIds, isLoading: isLoadingWishlist, error: wishlistError, notice: wishlistNotice, removeProduct, reload: reloadWishlist } = useWishlist()
 
   const [formData, setFormData] = useState({
@@ -48,7 +48,7 @@ const Profile = () => {
 
   const loadOrders = useCallback(async () => {
     const version = ++ordersRequestVersion.current
-    if (!token) {
+    if (!hasSession) {
       setOrders([])
       setOrderError('Please sign in to view your orders.')
       setIsLoadingOrders(false)
@@ -58,7 +58,7 @@ const Profile = () => {
     setIsLoadingOrders(true)
     setOrderError('')
     try {
-      const data = await apiRequest('/api/orders/mine', { token })
+      const data = await apiRequest('/api/orders/mine')
       if (version === ordersRequestVersion.current) setOrders(data.orders || [])
     } catch (err) {
       if (version === ordersRequestVersion.current) {
@@ -68,7 +68,7 @@ const Profile = () => {
     } finally {
       if (version === ordersRequestVersion.current) setIsLoadingOrders(false)
     }
-  }, [token])
+  }, [hasSession])
 
   useEffect(() => { loadOrders() }, [loadOrders])
 
@@ -131,10 +131,10 @@ const Profile = () => {
     setOrderActionError('')
     setOrderActionMessage('')
     try {
-      const actionData = await apiRequest(`/api/orders/${encodeURIComponent(order._id)}/${action}`, { method: 'POST', token })
+      const actionData = await apiRequest(`/api/orders/${encodeURIComponent(order._id)}/${action}`, { method: 'POST' })
       if (actionData.order) setOrders((current) => current.map((savedOrder) => savedOrder._id === order._id ? actionData.order : savedOrder))
       try {
-        const detailData = await apiRequest(`/api/orders/${encodeURIComponent(order._id)}`, { token })
+        const detailData = await apiRequest(`/api/orders/${encodeURIComponent(order._id)}`)
         setOrders((current) => current.map((savedOrder) => savedOrder._id === order._id ? detailData.order : savedOrder))
       } catch {
         const savedStatus = actionData.order?.status || 'updated'

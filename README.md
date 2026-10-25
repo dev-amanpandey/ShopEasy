@@ -24,7 +24,7 @@ A fully responsive e-commerce website built with React and Tailwind CSS. This pr
 
 ### Prerequisites
 
-- Node.js (version 14 or higher)
+- Node.js (version 22 or higher)
 - npm or yarn
 
 ### Installation
@@ -46,6 +46,10 @@ npm run dev
 ```
 
 4. Open your browser and navigate to `http://localhost:5173`
+
+### Google sign-in
+
+See [Google OAuth setup and local testing](docs/google-oauth.md) for Google Cloud Console configuration, required environment variables, and the manual flow checklist.
 
 ### Build for Production
 
