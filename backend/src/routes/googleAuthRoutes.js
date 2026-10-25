@@ -33,12 +33,29 @@ const clearOAuthCookie = (res) => {
   res.clearCookie(OAUTH_COOKIE, options);
 };
 
-const config = () => {
-  const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI, FRONTEND_URL, JWT_SECRET } = process.env;
-  if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !GOOGLE_REDIRECT_URI || !FRONTEND_URL || !JWT_SECRET) {
-    throw new Error('Google sign-in is not configured');
+const getFrontendOrigin = () => {
+  const configuredOrigin = process.env.FRONTEND_URL || (process.env.CLIENT_ORIGIN || '').split(',')[0].trim();
+  if (!configuredOrigin && process.env.NODE_ENV !== 'production') return 'http://localhost:5173';
+  if (!configuredOrigin) return null;
+  try {
+    return new URL(configuredOrigin).origin;
+  } catch {
+    return null;
   }
-  return { clientId: GOOGLE_CLIENT_ID, clientSecret: GOOGLE_CLIENT_SECRET, redirectUri: GOOGLE_REDIRECT_URI, frontendUrl: new URL(FRONTEND_URL).origin, jwtSecret: JWT_SECRET };
+};
+
+const config = () => {
+  const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI, JWT_SECRET } = process.env;
+  const frontendUrl = getFrontendOrigin();
+  const missing = [
+    ['GOOGLE_CLIENT_ID', GOOGLE_CLIENT_ID],
+    ['GOOGLE_CLIENT_SECRET', GOOGLE_CLIENT_SECRET],
+    ['GOOGLE_REDIRECT_URI', GOOGLE_REDIRECT_URI],
+    ['FRONTEND_URL or CLIENT_ORIGIN', frontendUrl],
+    ['JWT_SECRET', JWT_SECRET],
+  ].filter(([, value]) => !value).map(([name]) => name);
+  if (missing.length) throw new Error(`Google sign-in configuration is missing: ${missing.join(', ')}`);
+  return { clientId: GOOGLE_CLIENT_ID, clientSecret: GOOGLE_CLIENT_SECRET, redirectUri: GOOGLE_REDIRECT_URI, frontendUrl, jwtSecret: JWT_SECRET };
 };
 
 const createOAuthClient = ({ clientId, clientSecret, redirectUri }) => new OAuth2Client({
@@ -99,8 +116,9 @@ router.get('/google', oauthLimiter, async (req, res) => {
     }));
   } catch (error) {
     console.error('Could not start Google sign-in:', error.message);
-    const target = frontendUrl || process.env.FRONTEND_URL || 'http://localhost:5173';
-    redirectFailure(res, new URL(target).origin, 'google_unavailable');
+    const target = frontendUrl || getFrontendOrigin();
+    if (target) redirectFailure(res, target, 'google_unavailable');
+    else res.status(503).json({ message: 'Google sign-in is not configured' });
   }
 });
 
@@ -110,8 +128,9 @@ router.get('/google/callback', oauthLimiter, async (req, res) => {
     settings = config();
   } catch (error) {
     clearOAuthCookie(res);
-    const target = process.env.FRONTEND_URL || 'http://localhost:5173';
-    redirectFailure(res, new URL(target).origin, 'google_unavailable');
+    const target = getFrontendOrigin();
+    if (target) redirectFailure(res, target, 'google_unavailable');
+    else res.status(503).json({ message: 'Google sign-in is not configured' });
     return;
   }
 
