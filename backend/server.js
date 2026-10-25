@@ -29,19 +29,13 @@ const normalizeOrigin = (value) => {
   }
 };
 
-const isLocalDevelopmentOrigin = (value) => {
-  try {
-    const { protocol, hostname } = new URL(value);
-    return protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(hostname);
-  } catch {
-    return false;
-  }
-};
-
 const allowedOrigins = new Set(
   [
     ...(process.env.CLIENT_ORIGIN || '').split(','),
     process.env.FRONTEND_URL || '',
+    'https://e-commerce-lac-beta-32.vercel.app',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
   ]
     .map((origin) => normalizeOrigin(origin.trim()))
     .filter(Boolean)
@@ -54,7 +48,7 @@ connectDB();
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.has(normalizeOrigin(origin)) || isLocalDevelopmentOrigin(origin)) {
+      if (!origin || allowedOrigins.has(normalizeOrigin(origin))) {
         return callback(null, true);
       }
       return callback(new Error('Origin is not allowed by CORS'));

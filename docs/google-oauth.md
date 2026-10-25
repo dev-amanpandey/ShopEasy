@@ -32,7 +32,7 @@ Set the following values:
 | `VITE_API_BASE_URL` | Frontend's backend origin | `http://localhost:5000` |
 | `NODE_ENV` | Controls Secure cookie behavior | `development` locally; `production` on HTTPS |
 
-Use HTTPS and `NODE_ENV=production` in production. The session cookie is `HttpOnly`, `Secure`, `SameSite=Lax`. For cross-origin frontend/backend deployments, use same-site HTTPS hostnames (such as `shop.example.com` and `api.example.com`) and configure the exact frontend origin in `CLIENT_ORIGIN`. Rebuild the frontend after changing `VITE_API_BASE_URL`.
+Use HTTPS and `NODE_ENV=production` in production. The session cookie is `HttpOnly`, `Secure`, `SameSite=None` in production so credentialed requests from the Vercel frontend can send it to Render; local development uses `SameSite=Lax` without `Secure`. Set Render's `FRONTEND_URL` and `CLIENT_ORIGIN` to `https://e-commerce-lac-beta-32.vercel.app`, and set `GOOGLE_REDIRECT_URI` to `https://e-commerce-ziyi.onrender.com/auth/google/callback`. Rebuild the frontend after changing `VITE_API_BASE_URL`.
 
 ### Render backend service
 
