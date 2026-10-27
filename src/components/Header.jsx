@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ShoppingBag, Menu, X, Search } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
+import { useSmoothScroll } from '../scroll/SmoothScrollProvider'
 
 const SearchForm = ({ mobile = false, value, onChange, onSubmit }) => (
   <form onSubmit={onSubmit} className={mobile ? 'header-search header-search-mobile' : 'header-search'} role="search">
@@ -15,12 +16,18 @@ const SearchForm = ({ mobile = false, value, onChange, onSubmit }) => (
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const { setScrollStopped } = useSmoothScroll()
   const { getTotalItems } = useCart()
   const navigate = useNavigate()
   const location = useLocation()
   const { user, isAuthenticated, logout } = useAuth()
   const home = location.pathname === '/'
   const navigation = [{ name: 'Home', href: '/' }, { name: 'Products', href: '/products' }, { name: 'Categories', href: '/categories' }]
+
+  useEffect(() => {
+    setScrollStopped(isMenuOpen)
+    return () => setScrollStopped(false)
+  }, [isMenuOpen, setScrollStopped])
 
   const handleSearch = (e) => {
     e.preventDefault()

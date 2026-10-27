@@ -173,7 +173,7 @@ const Products = () => {
           </div>
 
           {/* Products Grid */}
-          <ProductGrid products={filteredProducts} />
+          <ProductGrid products={filteredProducts} reveal />
         </div>
       </div>
       </div>

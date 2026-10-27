@@ -17,6 +17,7 @@ import { WishlistProvider } from './context/WishlistContext'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
+import SmoothScrollProvider from './scroll/SmoothScrollProvider'
 
 function App() {
   return (
@@ -24,7 +25,8 @@ function App() {
       <AuthProvider>
         <WishlistProvider>
           <CartProvider>
-            <Layout>
+            <SmoothScrollProvider>
+              <Layout>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/products" element={<Products />} />
@@ -87,7 +89,8 @@ function App() {
                 }
               />
             </Routes>
-            </Layout>
+              </Layout>
+            </SmoothScrollProvider>
           </CartProvider>
         </WishlistProvider>
       </AuthProvider>

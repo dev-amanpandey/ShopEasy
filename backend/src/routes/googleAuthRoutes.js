@@ -29,7 +29,8 @@ const oauthCookieOptions = () => ({
 });
 
 const clearOAuthCookie = (res) => {
-  const { maxAge, ...options } = oauthCookieOptions();
+  const options = { ...oauthCookieOptions() };
+  delete options.maxAge;
   res.clearCookie(OAUTH_COOKIE, options);
 };
 
@@ -65,6 +66,8 @@ const createOAuthClient = ({ clientId, clientSecret, redirectUri }) => new OAuth
 });
 
 const safeRedirectPath = (candidate, frontendUrl) => {
+  // Control characters must be rejected in user supplied redirect paths.
+  // eslint-disable-next-line no-control-regex
   if (typeof candidate !== 'string' || !candidate.startsWith('/') || candidate.startsWith('//') || candidate.includes('\\') || /[\u0000-\u001f]/.test(candidate)) return '/profile';
   try {
     const parsed = new URL(candidate, frontendUrl);
@@ -126,7 +129,7 @@ router.get('/google/callback', oauthLimiter, async (req, res) => {
   let settings;
   try {
     settings = config();
-  } catch (error) {
+  } catch {
     clearOAuthCookie(res);
     const target = getFrontendOrigin();
     if (target) redirectFailure(res, target, 'google_unavailable');

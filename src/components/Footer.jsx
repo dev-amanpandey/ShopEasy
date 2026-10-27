@@ -9,7 +9,7 @@ const Footer = () => (
       <section><h2>Customer Service</h2><nav><Link to="/contact">Contact Us</Link><Link to="/shipping">Shipping Info</Link><Link to="/returns">Returns</Link><Link to="/faq">FAQ</Link></nav></section>
       <section><h2>Contact Info</h2><ul className="contact-list"><li><MapPin /><span>123 5KM Stone Road Rajnagar Extension Ghaziabad</span></li><li><Phone /><span>+1 (555) 123-4567</span></li><li><Mail /><span>info@shopeasy.com</span></li></ul></section>
     </div>
-    <div className="footer-bottom">© 2026 ShopEasy. All rights reserved.</div>
+    <div className="footer-bottom"><span>© 2026 ShopEasy. All rights reserved.</span><a className="footer-top-link" href="#">Back to top ↑</a></div>
   </footer>
 )
 

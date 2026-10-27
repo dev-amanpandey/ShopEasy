@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { PackageCheck, Truck, MapPin, Search } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
@@ -15,17 +15,7 @@ const OrderTracking = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    const params = new URLSearchParams(location.search)
-    const queryOrderId = params.get('id')
-
-    if (queryOrderId) {
-      setTrackingId(queryOrderId)
-      fetchOrder(queryOrderId)
-    }
-  }, [location.search])
-
-  const fetchOrder = async (id) => {
+  const fetchOrder = useCallback(async (id) => {
     if (!id || !hasSession) {
       setError('Please sign in to track your order.')
       return
@@ -44,7 +34,17 @@ const OrderTracking = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [hasSession])
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const queryOrderId = params.get('id')
+
+    if (queryOrderId) {
+      setTrackingId(queryOrderId)
+      fetchOrder(queryOrderId)
+    }
+  }, [location.search, fetchOrder])
 
   const currentStatusIndex = useMemo(() => {
     if (!order) return -1

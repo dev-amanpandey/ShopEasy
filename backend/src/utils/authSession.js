@@ -13,6 +13,7 @@ export const setSessionCookie = (res, token) => {
 };
 
 export const clearSessionCookie = (res) => {
-  const { maxAge, ...options } = sessionCookieOptions();
+  const options = { ...sessionCookieOptions() };
+  delete options.maxAge;
   res.clearCookie(SESSION_COOKIE, options);
 };
